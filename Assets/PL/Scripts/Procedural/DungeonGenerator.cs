@@ -5,16 +5,16 @@ public static class DungeonGenerator
 {
     const int EMPTY = 0;
     const int FLOOR = 1;
-    const int WALL_V = 2;
-    const int WALL_H = 3;
+    const int WALL_V = 2; //vertical wall
+    const int WALL_H = 3; //horizontal
     const int CORNER = 4;
-    const int DOOR_H = 5;
-    const int DOOR_V = 6;
+    const int DOOR_H = 5; //horizontal door
+    const int DOOR_V = 6; //vertical
 
     static int col;
     static int row;
 
-    public static int[,] GenerateInt(int width, int height, int seed, int probaDiv, int maxRooms, int minSplitSize, int minRoomClamp)
+    public static int[,] GenerateMatrix(int width, int height, int seed, int probaDiv, int maxRooms, int minSplitSize, int minRoomSize)
     {
         col = width;
         row = height;
@@ -32,21 +32,32 @@ public static class DungeonGenerator
             y++;
         }
 
-        Queue<Room> rooms = GenerateSubDivisions(probaDiv, maxRooms, minSplitSize, minRoomClamp, seed);
+        Queue<Room> rooms = GenerateSubDivisions(probaDiv, maxRooms, minSplitSize, minRoomSize, seed);
         List<Node> nodes = GenerateNodes(rooms);
         DrawRooms(map, nodes);
         GenerateCorridors(nodes, map);
-        ClassifyWalls(map);
-        PlaceDoors(map);
+
+        PlaceWalls(map); //not very opti to do three "place" functions, if i have time ill merge into one to only parcour the matrix once
+        PlaceDoors(map); //before i forget, some stuff has to be done before other, doors need to be created before decorations so idk if possible to merge the functions
+        PlaceDecorations(map);
 
         return map;
     }
 
-    static Queue<Room> GenerateSubDivisions(int probaDiv, int maxRooms, int minSplitSize, int minRoomClamp, int seed)
+    static Queue<Room> GenerateSubDivisions(int probaDiv, int maxRooms, int minSplitSize, int minRoomSize, int seed)
     {
         Queue<Room> rooms = new Queue<Room>();
         Queue<SubDivision> subDivisions = new Queue<SubDivision>();
-        Random rand = (seed == 0) ? new Random() : new Random(seed);
+        Random rand;
+
+        if (seed == 0)
+        {
+            rand = new Random();
+        }
+        else
+        {
+            rand = new Random(seed);
+        }
 
         subDivisions.Enqueue(new SubDivision(1, 1, col - 1, row - 1));
         int numRoom = 0;
@@ -54,11 +65,10 @@ public static class DungeonGenerator
         while (subDivisions.Count > 0 && numRoom < maxRooms)
         {
             SubDivision sub = subDivisions.Dequeue();
-
             if (sub.Width < minSplitSize && sub.Height < minSplitSize)
             {
-                int minW = Math.Max(1, Math.Min(minRoomClamp, sub.Width));
-                int minH = Math.Max(1, Math.Min(minRoomClamp, sub.Height));
+                int minW = Math.Max(1, Math.Min(minRoomSize, sub.Width));
+                int minH = Math.Max(1, Math.Min(minRoomSize, sub.Height));
                 int rw = rand.Next(minW, sub.Width + 1);
                 int rh = rand.Next(minH, sub.Height + 1);
                 rooms.Enqueue(new Room(sub.startX, sub.startY, rw, rh));
@@ -126,7 +136,6 @@ public static class DungeonGenerator
                         int dx1 = x - list[ind1].room.xPos;
                         int dy1 = y - list[ind1].room.yPos;
                         int d1 = dx1 * dx1 + dy1 * dy1;
-
                         if (d < d1)
                         {
                             ind3 = ind2;
@@ -161,7 +170,6 @@ public static class DungeonGenerator
                                         int dx3 = x - list[ind3].room.xPos;
                                         int dy3 = y - list[ind3].room.yPos;
                                         int d3 = dx3 * dx3 + dy3 * dy3;
-
                                         if (d < d3) ind3 = j;
                                     }
                                 }
@@ -172,9 +180,12 @@ public static class DungeonGenerator
                 j++;
             }
 
-            if (ind1 != -1) list[i].adjacentNodes.Add(list[ind1]);
-            if (ind2 != -1) list[i].adjacentNodes.Add(list[ind2]);
-            if (ind3 != -1) list[i].adjacentNodes.Add(list[ind3]);
+            if (ind1 != -1)
+                list[i].adjacentNodes.Add(list[ind1]);
+            if (ind2 != -1)
+                list[i].adjacentNodes.Add(list[ind2]);
+            if (ind3 != -1)
+                list[i].adjacentNodes.Add(list[ind3]);
 
             i++;
         }
@@ -276,7 +287,10 @@ public static class DungeonGenerator
         int probaConnect = 30;
 
         int z = 0;
-        while (z < nodes.Count) { nodes[z].connected = false; z++; }
+        while (z < nodes.Count)
+        {
+            nodes[z].connected = false; z++;
+        }
 
         Node n = nodes[0];
         n.connected = true;
@@ -352,7 +366,7 @@ public static class DungeonGenerator
         }
     }
 
-    static void ClassifyWalls(int[,] map)
+    static void PlaceWalls(int[,] map)
     {
         int h = map.GetLength(0);
         int w = map.GetLength(1);
@@ -365,22 +379,22 @@ public static class DungeonGenerator
             {
                 if (map[y, x] == EMPTY)
                 {
-                    bool nF = y - 1 >= 0 && map[y - 1, x] == FLOOR;
-                    bool eF = x + 1 < w && map[y, x + 1] == FLOOR;
-                    bool sF = y + 1 < h && map[y + 1, x] == FLOOR;
-                    bool wF = x - 1 >= 0 && map[y, x - 1] == FLOOR;
+                    bool nF = y - 1 >= 0 && map[y - 1, x] == FLOOR; //check if North tile is floor
+                    bool eF = x + 1 < w && map[y, x + 1] == FLOOR; //same with East
+                    bool sF = y + 1 < h && map[y + 1, x] == FLOOR; //South
+                    bool wF = x - 1 >= 0 && map[y, x - 1] == FLOOR; //West
 
-                    bool neF = y - 1 >= 0 && x + 1 < w && map[y - 1, x + 1] == FLOOR;
-                    bool seF = y + 1 < h && x + 1 < w && map[y + 1, x + 1] == FLOOR;
-                    bool swF = y + 1 < h && x - 1 >= 0 && map[y + 1, x - 1] == FLOOR;
-                    bool nwF = y - 1 >= 0 && x - 1 >= 0 && map[y - 1, x - 1] == FLOOR;
+                    bool neF = y - 1 >= 0 && x + 1 < w && map[y - 1, x + 1] == FLOOR; //North East
+                    bool seF = y + 1 < h && x + 1 < w && map[y + 1, x + 1] == FLOOR; //South East
+                    bool swF = y + 1 < h && x - 1 >= 0 && map[y + 1, x - 1] == FLOOR; //South West
+                    bool nwF = y - 1 >= 0 && x - 1 >= 0 && map[y - 1, x - 1] == FLOOR; //North West
 
                     if (nF || eF || sF || wF || neF || seF || swF || nwF)
                     {
                         bool cornerConvex = (nF || sF) && (eF || wF);
                         bool cornerConcave = (neF && !nF && !eF) || (seF && !sF && !eF) || (swF && !sF && !wF) || (nwF && !nF && !wF);
 
-                        if (cornerConvex || cornerConcave)
+                        if (cornerConvex || cornerConcave) //all corners will spawn same prefab for now
                         {
                             map[y, x] = CORNER;
                         }
@@ -397,7 +411,9 @@ public static class DungeonGenerator
         }
     }
 
-    static void PlaceDoors(int[,] map)
+    static void PlaceDoors(int[,] map) 
+        /*put doors when a floor tile has 2 floors on opposing sides and only 2 diagonal walls
+        (so we dont make doors everywhere in corridors) */
     {
         int h = map.GetLength(0);
         int w = map.GetLength(1);
@@ -410,12 +426,12 @@ public static class DungeonGenerator
             {
                 if (map[y, x] == FLOOR)
                 {
-                    bool nF = map[y - 1, x] == FLOOR;
+                    bool nF = map[y - 1, x] == FLOOR; //names are same as in PlaceWalls function just scroll a few lines up
                     bool sF = map[y + 1, x] == FLOOR;
                     bool eF = map[y, x + 1] == FLOOR;
                     bool wF = map[y, x - 1] == FLOOR;
 
-                    bool nW = map[y - 1, x] >= WALL_V && map[y - 1, x] <= CORNER;
+                    bool nW = map[y - 1, x] >= WALL_V && map[y - 1, x] <= CORNER; //same names but for walls
                     bool sW = map[y + 1, x] >= WALL_V && map[y + 1, x] <= CORNER;
                     bool eW = map[y, x + 1] >= WALL_V && map[y, x + 1] <= CORNER;
                     bool wW = map[y, x - 1] >= WALL_V && map[y, x - 1] <= CORNER;
@@ -438,6 +454,72 @@ public static class DungeonGenerator
                 x++;
             }
             y++;
+        }
+    }
+
+    static void PlaceDecorations(int[,] map, int probaDecoration = 10, int probaLibrary = 15) 
+        /*if a floor tile has max one neighboor tile that isnt a floor it can becore deco
+        if a floor tile has only one neighboor that ist floor and it is a deco, then it can become library with that neighboor*/
+    {
+        int h = map.GetLength(0);
+        int w = map.GetLength(1);
+        Random rand = new Random();
+
+        int FLOOR = 1;
+        int DOOR_H = 5;
+        int DOOR_V = 6;
+
+        for (int y = 1; y < h - 1; y++)
+        {
+            for (int x = 1; x < w - 1; x++)
+            {
+                if (map[y, x] == FLOOR)
+                {
+                    bool nearDoor = false;
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        for (int dx = -1; dx <= 1; dx++)
+                        {
+                            if (map[y + dy, x + dx] == DOOR_H || map[y + dy, x + dx] == DOOR_V)
+                            {
+                                nearDoor = true;
+                            }
+                        }
+                    }
+                    if (nearDoor) continue;
+
+                    int floorCount = 0;
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        for (int dx = -1; dx <= 1; dx++)
+                        {
+                            if (map[y + dy, x + dx] == FLOOR)
+                            {
+                                floorCount++;
+                            }
+                        }
+                    }
+
+                    if (floorCount >= 5 && rand.Next(0, 100) < probaDecoration)
+                    {
+                        map[y, x] = 7;
+
+                        if (rand.Next(0, 100) < probaLibrary)
+                        {
+                            if (map[y, x + 1] == FLOOR)
+                            {
+                                map[y, x] = 8;
+                                map[y, x + 1] = 8;
+                            }
+                            else if (map[y + 1, x] == FLOOR)
+                            {
+                                map[y, x] = 8;
+                                map[y + 1, x] = 8;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

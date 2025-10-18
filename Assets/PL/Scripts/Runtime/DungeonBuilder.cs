@@ -6,30 +6,36 @@ public class DungeonBuilder : MonoBehaviour
     //all accessible parameters for map gen
     public int width = 80;
     public int height = 40;
-    public int seed = 12345;
-    public int probaDiv = 85;
-    public int maxRooms = 25;
-    public int minSplitSize = 5;
-    public int minRoomClamp = 3;
+    public int seed = 0; //for generation (0 is random, other numbers generate specfic maps)
+    public int probaDiv = 85; //proba of dividing a subdivision again or selecting it to create a room
+    public int maxRooms = 25; //max amount of rooms in the map
+    public int minSplitSize = 5; //min size of subdivision
+    public int minRoomSize = 3; //min size of a room
 
-    public GameObject floorPrefab;
-    public GameObject wallVertical;
-    public GameObject wallHorizontal;
-    public GameObject wallCorner;
-    public GameObject doorHorizontal;
-    public GameObject doorVertical;
-    public GameObject wallVerticalTorch;
-    public GameObject wallHorizontalTorch;
+    //all prefabs to put in the map
+    public GameObject floorPrefab; //1
+    public GameObject wallVertical; //2
+    public GameObject wallHorizontal; //3
+    public GameObject wallCorner; //4
+    public GameObject doorHorizontal; //5
+    public GameObject doorVertical; //6
+    public GameObject decorationPrefab; //7
+    public GameObject libraryPrefab; //8
 
+    public GameObject wallVerticalTorch; //no specific number because of proba to exchange with a 2
+    public GameObject wallHorizontalTorch; //no specific number because of proba to exchange with a 3
+
+    //proba of spawning torches
     [Range(0, 100)] public int torchChanceVertical = 20;
     [Range(0, 100)] public int torchChanceHorizontal = 20;
 
+    //NavMesh management
     public GameObject navMeshCube;
     private NavMeshSurface navMeshSurface;
 
     void Start()
     {
-        int[,] map = DungeonGenerator.GenerateInt(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomClamp); //generate the matrix map
+        int[,] map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomSize); //generate the matrix map
         if (map != null)
         {
             Build(map); //spawns all the prefabs of walls, floors ect
@@ -50,11 +56,15 @@ public class DungeonBuilder : MonoBehaviour
             if (navMeshSurface != null)
             {
                 navMeshSurface.BuildNavMesh();
-                Debug.Log("NavMesh built, size: " + width + "x" + height);
+                Debug.Log("NavMesh built, size: " + width + "x" + height); //testing
+
+                MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>(); //so cube doesnt appear on top of the floor tiles
+                if (rend != null)
+                    rend.enabled = false;
             }
             else
             {
-                Debug.LogWarning("NavMeshSurface Null");
+                Debug.LogWarning("NavMeshSurface Null"); //testing
             }
         }
     }
@@ -101,9 +111,17 @@ public class DungeonBuilder : MonoBehaviour
                 {
                     pf = doorVertical;
                 }
+                else if (t == 7)
+                {
+                    pf = decorationPrefab;
+                }
+                else if (t == 8)
+                {
+                    pf = libraryPrefab;
+                }
                 if (pf != null)
                 {
-                    Instantiate(pf, new Vector3(x, 0f, y), Quaternion.identity, transform); //spawn prefab at coordinate x,y
+                    Instantiate(pf, new Vector3(x, 0f, y), Quaternion.identity, transform); //spawn chosen prefab at coordinate x,0,y
                 }
                 x++;
             }
