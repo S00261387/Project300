@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.AI.Navigation;
+using System.Collections.Generic;
 
 public class DungeonBuilder : MonoBehaviour
 {
@@ -21,8 +22,17 @@ public class DungeonBuilder : MonoBehaviour
     public GameObject libraryPrefab; //8
     public GameObject wallTorch; //no specific number because of proba to exchange with a 2 or 3
 
+    public GameObject wallHospital; //to replace the basic dungeon prefabs
+    public GameObject wallTorchHospital;
+
     //proba of spawning torches
     [Range(0, 100)] public int torchChance = 5;
+    [Range(0f, 100f)] public float sanity = 0f; //for testing, I have to move that in a player controller when we merge branches
+
+    private List<GameObject> normalWalls = new List<GameObject>(); //to know all the walls i have
+    private List<GameObject> torchWalls = new List<GameObject>(); //same with light walls
+    private bool hospitalWallsActive = false; //to make things appear and disappear
+    private bool hospitalTorchsActive = false; //same
 
     //NavMesh management
     public GameObject navMeshCube;
@@ -41,12 +51,10 @@ public class DungeonBuilder : MonoBehaviour
             newSize.x = width;
             newSize.z = height;
             navMeshCube.transform.localScale = newSize;
-
             Vector3 newPos = navMeshCube.transform.position;
             newPos.x = width / 2f; //middle of map is at width / 2
             newPos.z = height / 2f; //same
             navMeshCube.transform.position = newPos;
-
             navMeshSurface = navMeshCube.GetComponent<NavMeshSurface>();
             if (navMeshSurface != null)
             {
@@ -62,6 +70,10 @@ public class DungeonBuilder : MonoBehaviour
                 Debug.LogWarning("NavMeshSurface Null"); //testing
             }
         }
+    }
+    void Update()
+    {
+        UpdateMapWithSanity();
     }
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
@@ -123,11 +135,57 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 if (pf != null)
                 {
-                    Instantiate(pf, new Vector3(x, 0f, y), rot, transform); //spawn chosen prefab at coordinate x,0,y with rotation for vertical or horizontal
+                    GameObject obj = Instantiate(pf, new Vector3(x, 0f, y), rot, transform); //spawn chosen prefab at coordinate x,0,y with rotation for vertical or horizontal
+                    if (pf == wallPrefab)
+                        normalWalls.Add(obj);
+                    else if (pf == wallTorch)
+                        torchWalls.Add(obj);
                 }
                 x++;
             }
             y++;
+        }
+    }
+
+    void SwapPrefabs(List<GameObject> list, GameObject newPrefab)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            GameObject old = list[i];
+            if (old == null) continue;
+
+            Vector3 pos = old.transform.position;
+            Quaternion rot = old.transform.rotation;
+            Transform parent = old.transform.parent;
+
+            GameObject newObj = Instantiate(newPrefab, pos, rot, parent);
+            Destroy(old);
+            list[i] = newObj;
+        }
+    }
+
+    void UpdateMapWithSanity()
+    {
+        if (sanity > 50 && !hospitalWallsActive)
+        {
+            SwapPrefabs(normalWalls, wallHospital);
+            hospitalWallsActive = true;
+        }
+        else if (sanity <= 50 && hospitalWallsActive)
+        {
+            SwapPrefabs(normalWalls, wallPrefab);
+            hospitalWallsActive = false;
+        }
+
+        if (sanity > 70 && !hospitalTorchsActive)
+        {
+            SwapPrefabs(torchWalls, wallTorchHospital);
+            hospitalTorchsActive = true;
+        }
+        else if (sanity <= 70 && hospitalTorchsActive)
+        {
+            SwapPrefabs(torchWalls, wallTorch);
+            hospitalTorchsActive = false;
         }
     }
 }
