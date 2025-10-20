@@ -14,20 +14,15 @@ public class DungeonBuilder : MonoBehaviour
 
     //all prefabs to put in the map
     public GameObject floorPrefab; //1
-    public GameObject wallVertical; //2
-    public GameObject wallHorizontal; //3
+    public GameObject wallPrefab; //2 for vertical and 3 for horizontal
     public GameObject wallCorner; //4
-    public GameObject doorHorizontal; //5
-    public GameObject doorVertical; //6
+    public GameObject doorPrefab; //5 vertical and 6 horizontal
     public GameObject decorationPrefab; //7
     public GameObject libraryPrefab; //8
-
-    public GameObject wallVerticalTorch; //no specific number because of proba to exchange with a 2
-    public GameObject wallHorizontalTorch; //no specific number because of proba to exchange with a 3
+    public GameObject wallTorch; //no specific number because of proba to exchange with a 2 or 3
 
     //proba of spawning torches
-    [Range(0, 100)] public int torchChanceVertical = 20;
-    [Range(0, 100)] public int torchChanceHorizontal = 20;
+    [Range(0, 100)] public int torchChance = 5;
 
     //NavMesh management
     public GameObject navMeshCube;
@@ -81,23 +76,26 @@ public class DungeonBuilder : MonoBehaviour
             {
                 int t = map[y, x]; //current tile
                 GameObject pf = null; //the choosen prefab to spawn at the end of the loop
+                Quaternion rot = Quaternion.identity; //for rotation of prefabs
                 if (t == 1)
                 {
                     pf = floorPrefab;
                 }
                 else if (t == 2)
                 {
-                    if (wallVerticalTorch != null && torchChanceVertical > 0 && Random.Range(0, 100) < torchChanceVertical) //might become wall with lights
-                        pf = wallVerticalTorch;
+                    rot = Quaternion.Euler(0, 90, 0);
+                    if (wallTorch != null && Random.Range(0, 100) < torchChance)
+                        pf = wallTorch;
                     else
-                        pf = wallVertical;
+                        pf = wallPrefab;
                 }
                 else if (t == 3)
                 {
-                    if (wallHorizontalTorch != null && torchChanceHorizontal > 0 && Random.Range(0, 100) < torchChanceHorizontal) //same
-                        pf = wallHorizontalTorch;
+                    rot = Quaternion.identity;
+                    if (wallTorch != null && Random.Range(0, 100) < torchChance)
+                        pf = wallTorch;
                     else
-                        pf = wallHorizontal;
+                        pf = wallPrefab;
                 }
                 else if (t == 4)
                 {
@@ -105,11 +103,15 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 else if (t == 5)
                 {
-                    pf = doorHorizontal;
+
+                    rot = Quaternion.Euler(0, 90, 0);
+                    pf = doorPrefab;
                 }
                 else if (t == 6)
                 {
-                    pf = doorVertical;
+
+                    rot = Quaternion.identity;
+                    pf = doorPrefab;
                 }
                 else if (t == 7)
                 {
@@ -121,7 +123,7 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 if (pf != null)
                 {
-                    Instantiate(pf, new Vector3(x, 0f, y), Quaternion.identity, transform); //spawn chosen prefab at coordinate x,0,y
+                    Instantiate(pf, new Vector3(x, 0f, y), rot, transform); //spawn chosen prefab at coordinate x,0,y with rotation for vertical or horizontal
                 }
                 x++;
             }

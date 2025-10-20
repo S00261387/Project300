@@ -15,6 +15,7 @@ public static class DungeonGenerator
     static int row;
 
     public static int[,] GenerateMatrix(int width, int height, int seed, int probaDiv, int maxRooms, int minSplitSize, int minRoomSize)
+        /*uses all our functions to create a matrix of int with rooms and corridors and specific numbers for floors, walls, doors ect*/
     {
         col = width;
         row = height;
@@ -46,6 +47,9 @@ public static class DungeonGenerator
 
     static Queue<Room> GenerateSubDivisions(int probaDiv, int maxRooms, int minSplitSize, int minRoomSize, int seed)
     {
+        /*puts the map dimensions in a queue, then we loop doing unqueue, what we get we either split in two and put those parts 
+         * in the queue again (depends on max size, min size and a probability number) or we take it and generate a room within the dimensions of the subdivided space.
+         We return the list of all the rooms created for the map.*/
         Queue<Room> rooms = new Queue<Room>();
         Queue<SubDivision> subDivisions = new Queue<SubDivision>();
         Random rand;
@@ -104,6 +108,7 @@ public static class DungeonGenerator
     }
 
     static List<Node> GenerateNodes(Queue<Room> rooms)
+        /*generates the list of nodes from the queue rooms (with ajacent rooms) so we can use it in our graph algorithme*/
     {
         List<Node> list = new List<Node>();
         while (rooms.Count > 0) list.Add(new Node(rooms.Dequeue()));
@@ -194,6 +199,7 @@ public static class DungeonGenerator
     }
 
     static void DrawRooms(int[,] map, List<Node> nodes)
+        /*just lace floors inside the room dimensions*/
     {
         int k = 0;
         while (k < nodes.Count)
@@ -221,6 +227,7 @@ public static class DungeonGenerator
     }
 
     static void DrawCorridor(Room r1, Room r2, int[,] map)
+        /*places floor tiles to link the two rooms centers*/
     {
         int x1 = r1.xPos + r1.xSize / 2;
         int y1 = r1.yPos + r1.ySize / 2;
@@ -279,6 +286,10 @@ public static class DungeonGenerator
     }
 
     static void GenerateCorridors(List<Node> nodes, int[,] map)
+        /*Take first node, trace a corridor from its center to the height or depth of the 1 or 2 randmly selected room 
+         * from the adjacent rooms and then to the depth or height of the center of those rooms and check those rooms 
+         * as connected to the main network, then put those rooms in a queue, we do the same for each rooms 
+         * of the queue until queue is empty, we then check all the rooms to see if they are connected to the main network, if not we connect them to a room that is connected.*/
     {
         if (nodes.Count == 0) return;
 
