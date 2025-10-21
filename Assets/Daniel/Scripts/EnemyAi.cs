@@ -21,17 +21,25 @@ public class EnemyAi : MonoBehaviour
     private float MoveCdTimer;
     Vector3 Home;
     public float HomeRadius;
-    public float PathUpdateDelay = 0.2f;
-    private float PathUpdateDeadline;
+    bool PlayerHidden = true;
+    [SerializeField] private float DetectAngle = 45;
+    private Vector3 side1;
+    private Vector3 side2;
 
     //States
     public float sightRange;
     public bool playerInSightRange;
 
+    //Animation
     public Animator animator;
-
     public bool Chasing;
     public bool Attacking;
+
+    //Audio
+    [SerializeField] private AudioClip[] IdleAudios;
+    [SerializeField] private AudioClip ChasingAudio;
+    [SerializeField] private float SoundDelay = 10;
+    private float SoundDelayTimer;
 
     private void Awake()
     {
@@ -39,32 +47,60 @@ public class EnemyAi : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         Home = transform.position;
+
     }
 
     private void Update()
     {
         playerInSightRange = Vector3.Distance(transform.position, player.transform.position) <= sightRange;
 
-        if (!playerInSightRange)
-        { 
-            Chasing = false;
-            Patrolling(); 
-        }
 
-        if (playerInSightRange)
-        {
-            Chasing = true;
-            ChasePlayer(); 
-        }
+        //if (!playerInSightRange)
+        //{
+        //    Chasing = false;
+        //    Patrolling();
+        //}
 
         if (MoveCdTimer > 0)
         {
             MoveCdTimer -= Time.deltaTime;
         }
 
+        if (SoundDelayTimer > 0)
+        {
+            SoundDelayTimer -= Time.deltaTime;
+        }
+
         animator.SetFloat("Speed", agent.desiredVelocity.sqrMagnitude);
         animator.SetBool("Chasing", Chasing);
         animator.SetBool("Attacking", Attacking);
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, Mathf.Infinity))
+        {
+            if(hit.transform == player.transform) 
+            { 
+            PlayerHidden = false;
+            }
+            else
+            {
+                PlayerHidden = true;
+            }
+        }
+
+        side1 = player.transform.position - transform.position;
+        side2 = transform.forward;
+        float angle = Vector3.SignedAngle(side1, side2, Vector3.up);
+        if (angle < DetectAngle && angle > -DetectAngle && playerInSightRange && !PlayerHidden)
+        {
+            Chasing = true;
+            ChasePlayer();
+        }
+        else
+        {
+            Chasing = false;
+            Patrolling();
+        }
     }
 
     private void Patrolling()
@@ -74,6 +110,11 @@ public class EnemyAi : MonoBehaviour
             agent.SetDestination(Home);
         }
 
+        if (SoundDelayTimer <= 0)
+        {
+            SoundDelayTimer = SoundDelay;
+            SoundFXManager.Instance.PlayRandomSoundFXClip(IdleAudios, transform);
+        }
 
         if (!walkPointSet) SearchWalkPoint();
 
@@ -97,21 +138,6 @@ public class EnemyAi : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject == player)
-        {
-            Attacking = true;
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject == player)
-        {
-            Attacking = false;
-        }
-    }
 
     private void SearchWalkPoint()
         {
@@ -125,13 +151,17 @@ public class EnemyAi : MonoBehaviour
 
         }
 
-        private void ChasePlayer()
+    private void ChasePlayer()
+    {
+        if (SoundDelayTimer <= 0)
         {
-        if (Time.deltaTime >= PathUpdateDeadline)
-        {
-            PathUpdateDeadline = Time.deltaTime + PathUpdateDelay;
+            SoundDelayTimer = SoundDelay;
+            SoundFXManager.Instance.PlaySoundFXClip(ChasingAudio, transform);
         }
-            agent.SetDestination(player.position);
-        }
+
+        agent.SetDestination(player.position);
+
+        
+    }
     
 }
