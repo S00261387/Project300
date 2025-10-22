@@ -25,6 +25,7 @@ public class EnemyAi : MonoBehaviour
     [SerializeField] private float DetectAngle = 45;
     private Vector3 side1;
     private Vector3 side2;
+    private bool Chase;
 
     //States
     public float sightRange;
@@ -92,6 +93,11 @@ public class EnemyAi : MonoBehaviour
         side2 = transform.forward;
         float angle = Vector3.SignedAngle(side1, side2, Vector3.up);
         if (angle < DetectAngle && angle > -DetectAngle && playerInSightRange && !PlayerHidden)
+        {
+            Chase = true;
+        }
+
+        if (Chase)
         {
             Chasing = true;
             ChasePlayer();
@@ -161,7 +167,10 @@ public class EnemyAi : MonoBehaviour
 
         agent.SetDestination(player.position);
 
-        
+        if (!playerInSightRange)
+        {
+            Chase = false;
+        }
     }
     
 }
