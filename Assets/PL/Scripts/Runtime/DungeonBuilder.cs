@@ -13,6 +13,10 @@ public class DungeonBuilder : MonoBehaviour
     public int minSplitSize = 5; //min size of subdivision
     public int minRoomSize = 3; //min size of a room
 
+    public GameObject PlayerPrefab;
+    public GameObject EnemyPrefab;
+
+
     //all prefabs to put in the map
     public GameObject floorPrefab; //1
     public GameObject wallPrefab; //2 for vertical and 3 for horizontal
@@ -78,6 +82,8 @@ public class DungeonBuilder : MonoBehaviour
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
     {
+        bool PlayerSpawned = false;
+        //need to create a random to spawn player?
         int h = map.GetLength(0);
         int w = map.GetLength(1);
         int y = 0;
