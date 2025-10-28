@@ -2,15 +2,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInput))]
-//[RequireComponent(typeof(PlayerCamera))]
+[RequireComponent(typeof(PlayerRotation))]
 //[RequireComponent(typeof(PlayerAttack))]
 //[RequireComponent(typeof(PlayerInteraction))]
 [RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerThrow))]
 public class PlayerController : MonoBehaviour
 {
    private PlayerInput playerInput;
-   //private PlayerCamera PlayerCamera;
-   private PlayerMovement playerMovement;
+    private PlayerRotation playerRotation;
+    private PlayerMovement playerMovement; 
+    private PlayerThrow playerThrow;
    //private PlayerInteraction playerInteraction;
     //private PlayerAttack playerAttack;
 
@@ -18,8 +20,9 @@ public class PlayerController : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         playerMovement = GetComponent<PlayerMovement>();
+        playerThrow = GetComponent<PlayerThrow>();
         //playerInteraction = GetComponent<PlayerInteraction>();
-        //PlayerCamera = GetComponent<PlayerCamera>();
+        playerRotation = GetComponent<PlayerRotation>();
         //playerAttack = GetComponent<PlayerAttack>();
     }
 
@@ -44,8 +47,8 @@ public class PlayerController : MonoBehaviour
         //playerInput.actions["Crouch"].performed += playerMovement.OnCrouch;
         //playerInput.actions["Sprint"].performed += playerMovement.OnSprint;
         playerInput.actions["Dash"].performed += playerMovement.OnDash;
-
-        //playerInput.actions["Look"].performed += PlayerCamera.OnLook;
+        playerInput.actions["Throw"].performed += playerThrow.OnThrow;
+        ////playerInput.actions["Look"].performed += PlayerRotation.OnLook;
         //playerInput.actions["Interact"].performed += playerInteraction.OnInteract;
         //playerInput.actions["Attack"].performed += playerAttack.OnAttack;
     }
@@ -61,8 +64,9 @@ public class PlayerController : MonoBehaviour
         //playerInput.actions["Crouch"].performed -= playerMovement.OnCrouch;
         //playerInput.actions["Sprint"].performed -= playerMovement.OnSprint;
         playerInput.actions["Dash"].performed -= playerMovement.OnDash;
+        playerInput.actions["Throw"].performed -= playerThrow.OnThrow;
 
-        //playerInput.actions["Look"].performed -= PlayerCamera.OnLook;
+        playerInput.actions["Look"].performed -= playerRotation.OnLook;
         //playerInput.actions["Interact"].performed -= playerInteraction.OnInteract;
         //playerInput.actions["Attack"].performed -= playerAttack.OnAttack;
     }

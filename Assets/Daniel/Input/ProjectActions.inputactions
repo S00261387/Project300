@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "ProjectActions",
     "maps": [
         {
@@ -81,6 +82,15 @@
                     "name": "Dash",
                     "type": "Button",
                     "id": "7bdb8d48-2d5b-4eef-b9b2-07bc0076216c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Throw",
+                    "type": "Button",
+                    "id": "b1f45baa-b780-416a-a256-59587caad85e",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -327,6 +337,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "117434d7-4bce-4bc9-8f8a-d7b4e9c9ff35",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throw",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
