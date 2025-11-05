@@ -36,6 +36,13 @@ public class PlayerMovement : MonoBehaviour
     private float NormalHeight;
     public int JumpCount;
 
+    private Vector2 lookInput;
+    private float mouseX;
+    private float mouseY;
+    private float xRotation;
+
+    [SerializeField] private Camera viewCamera;
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -47,6 +54,9 @@ public class PlayerMovement : MonoBehaviour
     public void OnMove(InputAction.CallbackContext obj)
     {
         movementInput = obj.ReadValue<Vector2>();
+        Vector3 mousePosition = Input.mousePosition;
+        float targetAngle = Mathf.Atan2(mousePosition.x, mousePosition.y) * Mathf.Rad2Deg; 
+        transform.rotation = Quaternion.Euler(0, targetAngle, 0);
     }
 
     public void OnJump(InputAction.CallbackContext obj)
@@ -128,6 +138,5 @@ public class PlayerMovement : MonoBehaviour
         movementVelocity.y -= Gravity * Time.deltaTime;
 
         characterController.Move(((movement * currentSpeed) + movementVelocity) * Time.deltaTime);
-     
     }
 }

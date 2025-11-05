@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAi : MonoBehaviour
+public class EnemyAi: MonoBehaviour
 {
     public NavMeshAgent agent;
 
@@ -11,9 +11,14 @@ public class EnemyAi : MonoBehaviour
 
 
 
-  
+
 
     //Patroling
+    //public Vector3[] walkPoints;
+    //private Vector3 currentWalkPoint;
+    //public Vector3 nextWalkPoint;
+    //bool walkPointsSet = false;
+    //private int currentPoint = 0;
     public Vector3 walkPoint;
     bool walkPointSet = false;
     public float walkPointRange;
@@ -21,41 +26,50 @@ public class EnemyAi : MonoBehaviour
     private float MoveCdTimer;
     Vector3 Home;
     public float HomeRadius;
-    bool PlayerHidden = true;
-    [SerializeField] private float DetectAngle = 45;
-    private Vector3 side1;
-    private Vector3 side2;
-    private bool Chase;
 
-    //States
-    public float sightRange;
-    public bool playerInSightRange;
+    //Searching
+
+    [SerializeField] float fullAwareness;
+    [SerializeField] private float halfAwareness;
+    [SerializeField] private float awareness;
+    public bool searchingStarted;
+    
 
     //Animation
     public Animator animator;
     public bool Chasing;
     public bool Attacking;
 
+    //States
+    [SerializeField] private bool Chase;
+    [SerializeField] private bool Search;
+    [SerializeField] private bool Patrol = true;
+
     //Audio
     [SerializeField] private AudioClip[] IdleAudios;
     [SerializeField] private AudioClip ChasingAudio;
     [SerializeField] private float SoundDelay = 10;
     private float SoundDelayTimer;
+    private bool PlayedChaseSound;
+
+    //FOV
+    public FieldOfView fov;
 
     private void Awake()
     {
         player = GameObject.Find("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        fov = GetComponent<FieldOfView>();
         Home = transform.position;
-
+        halfAwareness = fullAwareness / 2;
+        //walkPoints = new Vector3[Random.Range(3, 6)];
     }
 
     private void Update()
     {
-        playerInSightRange = Vector3.Distance(transform.position, player.transform.position) <= sightRange;
-
-
+        //playerInSightRange = Vector3.Distance(transform.position, player.transform.position) <= sightRange;
+        fov.FindVisibleTargets();
         //if (!playerInSightRange)
         //{
         //    Chasing = false;
@@ -76,25 +90,26 @@ public class EnemyAi : MonoBehaviour
         animator.SetBool("Chasing", Chasing);
         animator.SetBool("Attacking", Attacking);
 
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, Mathf.Infinity))
-        {
-            if(hit.transform == player.transform) 
-            { 
-            PlayerHidden = false;
-            }
-            else
-            {
-                PlayerHidden = true;
-            }
-        }
+        //RaycastHit hit;
+        //if (Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, Mathf.Infinity))
+        //{
+        //    if(hit.transform == player.transform) 
+        //    { 
+        //    PlayerHidden = false;
+        //    }
+        //    else
+        //    {
+        //        PlayerHidden = true;
+        //    }
+        //}
 
-        side1 = player.transform.position - transform.position;
-        side2 = transform.forward;
-        float angle = Vector3.SignedAngle(side1, side2, Vector3.up);
-        if (angle < DetectAngle && angle > -DetectAngle && playerInSightRange && !PlayerHidden)
+        //side1 = player.transform.position - transform.position;
+        //side2 = transform.forward;
+        //float angle = Vector3.SignedAngle(side1, side2, Vector3.up);
+        if (fov.visible && !Chase)
         {
-            Chase = true;
+            Patrol = false;
+           Search = true;
         }
 
         if (Chase)
@@ -102,11 +117,58 @@ public class EnemyAi : MonoBehaviour
             Chasing = true;
             ChasePlayer();
         }
-        else
+        if (Search)
+        {
+            Chasing = false;
+            Searching();
+        }
+        if (Patrol)
         {
             Chasing = false;
             Patrolling();
         }
+        //else
+        //{
+        //    Chasing = false;
+        //    Patrolling();
+        //}
+
+        
+    }
+
+    private void Searching()
+    {
+
+        //Quaternion.LookRotation(player.transform.position);
+        if (!searchingStarted)
+        {
+            awareness = halfAwareness;
+            searchingStarted = true;
+        }
+       
+        if (fov.visible)
+        {
+            awareness -= Time.deltaTime;
+        }
+        else
+        {
+            awareness += Time.deltaTime;
+        }
+
+        if (awareness <= 0)
+        {
+            Search = false;
+            searchingStarted = false;
+            Chase = true;
+        }
+
+        if (awareness >= fullAwareness)
+        {
+            Search = false;
+            searchingStarted = false;
+            Patrol = true;
+        }
+
     }
 
     private void Patrolling()
@@ -122,7 +184,32 @@ public class EnemyAi : MonoBehaviour
             SoundFXManager.Instance.PlayRandomSoundFXClip(IdleAudios, transform);
         }
 
+        if (PlayedChaseSound)
+        {
+            PlayedChaseSound = false;
+        }
+
         if (!walkPointSet) SearchWalkPoint();
+
+
+        //if (MoveCdTimer > 0)
+        //{
+        //    return;
+        //}
+        //else
+        //{
+        //    MoveCdTimer = MoveCd;
+        //    agent.SetDestination(walkPoints[currentPoint]);
+        //   if (currentPoint == walkPoints.Length - 1)
+        //   {
+        //       currentPoint = 0;
+        //   }
+        //   else
+        //   {
+        //       currentPoint++;
+        //   }
+
+        //}
 
         if (walkPointSet)
         {
@@ -142,34 +229,71 @@ public class EnemyAi : MonoBehaviour
                     walkPointSet = false;
             }
         }
+
+    }
+
+    private void SearchWalkPoint()
+    {
+        float randomZ = Random.Range(-walkPointRange, walkPointRange);
+        float randomX = Random.Range(-walkPointRange, walkPointRange);
+
+        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(transform.position, walkPoint) >= walkPointRange / 2)
+            walkPointSet = true;
+
     }
 
 
-    private void SearchWalkPoint()
-        {
-            float randomZ = Random.Range(-walkPointRange, walkPointRange);
-            float randomX = Random.Range(-walkPointRange, walkPointRange);
+    //private Vector3[] SearchWalkPoint(Vector3[] WalkPoints)
+    //{
+    //    bool walkPointValid;
+    //    for (int i = 0; i < WalkPoints.Length; i++)
+    //    {
+    //        walkPointValid = false;
+    //        do
+    //        {
+    //            if (i == 0)
+    //            {
+    //                WalkPoints[i] = transform.position;
+    //                walkPointValid = true;
+    //            }
+    //            else 
+    //            { 
 
-            walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+    //                float randomZ = Random.Range(-walkPointRange, walkPointRange);
+    //                float randomX = Random.Range(-walkPointRange, walkPointRange);
 
-            if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(transform.position, walkPoint) >= walkPointRange/2)
-                walkPointSet = true;
+    //                Vector3 walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);             
 
-        }
+    //                if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(transform.position, walkPoint) >= walkPointRange - 2)
+    //                {
+    //                    WalkPoints[i] = walkPoint;
+    //                    walkPointValid = true;
+    //                }
+    //                //Vector3.Distance(walkPoint, Home) <= HomeRadius && && Vector3.Distance(WalkPoints[i - 1], walkPoint) <= walkPointRange 
+
+    //            }
+    //        }
+    //        while (!walkPointValid);
+    //    }
+    //    return WalkPoints;
+    //}
 
     private void ChasePlayer()
     {
-        if (SoundDelayTimer <= 0)
+        if (!PlayedChaseSound)
         {
-            SoundDelayTimer = SoundDelay;
             SoundFXManager.Instance.PlaySoundFXClip(ChasingAudio, transform);
+            PlayedChaseSound = true;
         }
 
         agent.SetDestination(player.position);
 
-        if (!playerInSightRange)
+        if (!fov.visible)
         {
             Chase = false;
+            Search = true;
         }
     }
     
