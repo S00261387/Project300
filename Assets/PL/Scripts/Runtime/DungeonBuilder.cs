@@ -82,7 +82,7 @@ public class DungeonBuilder : MonoBehaviour
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
     {
-        bool PlayerSpawned = false;
+        //bool PlayerSpawned = false;
         //need to create a random to spawn player?____________________________________________________________________________________________________________________still in progress
         int h = map.GetLength(0);
         int w = map.GetLength(1);
