@@ -13,8 +13,8 @@ public class DungeonBuilder : MonoBehaviour
     public int minSplitSize = 5; //min size of subdivision
     public int minRoomSize = 3; //min size of a room
 
-    public GameObject PlayerPrefab;
-    public GameObject EnemyPrefab;
+    public GameObject PlayerPrefab; //999
+    public GameObject EnemyPrefab; //88
 
 
     //all prefabs to put in the map
@@ -28,6 +28,8 @@ public class DungeonBuilder : MonoBehaviour
 
     public GameObject wallHospital; //to replace the basic dungeon prefabs
     public GameObject wallTorchHospital;
+
+    public GameObject EscapePrefab; //777
 
     //proba of spawning torches
     [Range(0, 100)] public int torchChance = 5;
@@ -138,6 +140,17 @@ public class DungeonBuilder : MonoBehaviour
                 else if (t == 8)
                 {
                     pf = libraryPrefab;
+                }
+                else if (t == 999 || t == 88 || t == 777)
+                {
+                    pf = floorPrefab; //so entities dont fall in the void when spawned lol
+
+                    if (t == 999)
+                        Instantiate(PlayerPrefab, new Vector3(x, 0f, y), Quaternion.identity);
+                    else if (t == 88)
+                        Instantiate(EnemyPrefab, new Vector3(x, 0f, y), Quaternion.identity);
+                    else if (t == 777)
+                        Instantiate(EscapePrefab, new Vector3(x, 0f, y), Quaternion.identity);
                 }
                 if (pf != null)
                 {

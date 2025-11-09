@@ -41,6 +41,7 @@ public static class DungeonGenerator
         PlaceWalls(map); //not very opti to do three "place" functions, if i have time ill merge into one to only parcour the matrix once
         PlaceDoors(map); //before i forget, some stuff has to be done before other, doors need to be created before decorations so idk if possible to merge the functions
         PlaceDecorations(map);
+        PlaceEntities(map, nodes, 10); //number of ennemy we want
 
         return map;
     }
@@ -533,4 +534,48 @@ public static class DungeonGenerator
             }
         }
     }
+
+    static void PlaceEntities(int[,] map, List<Node> nodes, int enemyCount = 10)
+    {
+        if (nodes == null || nodes.Count == 0) return;
+
+        Random rand = new Random();
+        Node startNode = nodes[rand.Next(0, nodes.Count)];
+        Room playerRoom = startNode.room; //random room to spawn player in
+
+        int px = playerRoom.xPos + playerRoom.xSize / 2;
+        int py = playerRoom.yPos + playerRoom.ySize / 2;
+        map[py, px] = 999; //player number
+
+        int enemiesPlaced = 0;
+        while (enemiesPlaced < enemyCount)
+        {
+            Node n = nodes[rand.Next(0, nodes.Count)];
+            if (n == startNode) continue; //no ennemies in player spawn room
+            Room r = n.room;
+
+            int ex = rand.Next(r.xPos + 1, r.xPos + r.xSize - 1);
+            int ey = rand.Next(r.yPos + 1, r.yPos + r.ySize - 1);
+
+            if (map[ey, ex] == 1)
+            {
+                map[ey, ex] = 88; //ennemy number
+                enemiesPlaced++;
+            }
+        }
+
+        Node ladderNode = null;
+        while (ladderNode == null)
+        {
+            Node n = nodes[rand.Next(0, nodes.Count)];
+            if (n != startNode)
+                ladderNode = n;
+        }
+
+        Room ladderRoom = ladderNode.room;
+        int lx = ladderRoom.xPos + ladderRoom.xSize / 2;
+        int ly = ladderRoom.yPos + ladderRoom.ySize / 2;
+        map[ly, lx] = 777; //escape number
+    }
+
 }

@@ -430,6 +430,7 @@ MonoBehaviour:
   wallTorch: {fileID: 4991790997309320783, guid: c4dae750859e6c84eb85f4c484b158d6, type: 3}
   wallHospital: {fileID: 2421902578710628384, guid: 766a6e648bc75c547ad9fa352b040a11, type: 3}
   wallTorchHospital: {fileID: 5133983182189626621, guid: cc75a75a80d51c54cb37152129c72f22, type: 3}
+  EscapePrefab: {fileID: 3055551850030303151, guid: e4d586e5726edb941ab7765ae16a0c7e, type: 3}
   torchChance: 5
   sanity: 0
   navMeshCube: {fileID: 2080794216794678436}
