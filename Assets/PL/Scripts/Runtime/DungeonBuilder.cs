@@ -13,7 +13,8 @@ public class DungeonBuilder : MonoBehaviour
     public int minSplitSize = 5; //min size of subdivision
     public int minRoomSize = 3; //min size of a room
 
-    public GameObject PlayerPrefab; //999
+    static Vector2Int playerSpawn = Vector2Int.zero; //spawnPoint
+    public GameObject Player; //999
     public GameObject EnemyPrefab; //88
 
 
@@ -65,7 +66,6 @@ public class DungeonBuilder : MonoBehaviour
             if (navMeshSurface != null)
             {
                 navMeshSurface.BuildNavMesh();
-                Debug.Log("NavMesh built, size: " + width + "x" + height); //testing
 
                 MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>(); //so cube doesnt appear on top of the floor tiles
                 if (rend != null)
@@ -76,6 +76,7 @@ public class DungeonBuilder : MonoBehaviour
                 Debug.LogWarning("NavMeshSurface Null"); //testing
             }
         }
+        PlacePlayer(playerSpawn); //tp player to spawn
     }
     void Update()
     {
@@ -146,7 +147,7 @@ public class DungeonBuilder : MonoBehaviour
                     pf = floorPrefab; //so entities dont fall in the void when spawned lol
 
                     if (t == 999)
-                        Instantiate(PlayerPrefab, new Vector3(x, 0f, y), Quaternion.identity);
+                        playerSpawn = new Vector2Int(x, y); //we will teleport the player there, not instanciate it
                     else if (t == 88)
                         Instantiate(EnemyPrefab, new Vector3(x, 0f, y), Quaternion.identity);
                     else if (t == 777)
@@ -206,5 +207,16 @@ public class DungeonBuilder : MonoBehaviour
             SwapPrefabs(torchWalls, wallTorch);
             hospitalTorchsActive = false;
         }
+    }
+    void PlacePlayer(Vector2Int spawnTile) //teleport player to spawn position
+    {
+        if (Player == null)
+        {
+            Debug.LogWarning("Player is null");
+            return;
+        }
+
+        Vector3 pos = new Vector3(spawnTile.x + 0.5f, 0f, spawnTile.y + 0.5f);
+        Player.transform.position = pos;
     }
 }
