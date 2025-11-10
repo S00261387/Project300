@@ -1,5 +1,7 @@
 using UnityEngine;
 using Unity.AI.Navigation;
+using UnityEngine.AI;
+using System.Collections;
 using System.Collections.Generic;
 
 public class DungeonBuilder : MonoBehaviour
@@ -219,4 +221,70 @@ public class DungeonBuilder : MonoBehaviour
         Vector3 pos = new Vector3(spawnTile.x + 0.5f, 0f, spawnTile.y + 0.5f);
         Player.transform.position = pos;
     }
+
+    public void GenerateNewMap() //get rid of old map and creat new map with new navMesh
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.gameObject != navMeshCube)
+                Destroy(child.gameObject);
+        }
+
+        GameObject[] oldEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in oldEnemies)
+        {
+            Destroy(enemy);
+        }
+
+        GameObject[] oldEscapeDoor = GameObject.FindGameObjectsWithTag("EscapeDoor");
+        foreach (GameObject escapeDoor in oldEscapeDoor)
+        {
+            Destroy(escapeDoor);
+        }
+
+        StartCoroutine(RebuildNavMeshAfterCleanup());
+    }
+
+    private IEnumerator RebuildNavMeshAfterCleanup() //need to wait for navmesh obstacles from past map to disappear before making new navMesh surface
+    {
+        yield return null;
+
+        NavMesh.RemoveAllNavMeshData();
+
+        int[,] map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomSize);
+        Build(map);
+        PlacePlayer(playerSpawn);
+
+        if (navMeshCube != null)
+        {
+            Vector3 newScale = new Vector3(width, 1f, height);
+            navMeshCube.transform.localScale = newScale;
+            navMeshCube.transform.position = new Vector3(width / 2f - 0.5f, 0f, height / 2f - 0.5f);
+
+            BoxCollider col = navMeshCube.GetComponent<BoxCollider>();
+            if (col == null)
+                col = navMeshCube.AddComponent<BoxCollider>();
+
+            if (navMeshSurface == null)
+                navMeshSurface = navMeshCube.GetComponent<NavMeshSurface>();
+            if (navMeshSurface == null)
+                navMeshSurface = navMeshCube.AddComponent<NavMeshSurface>();
+
+            navMeshSurface.collectObjects = CollectObjects.All;
+            navMeshSurface.layerMask = ~0;
+
+            yield return null;
+
+            navMeshSurface.BuildNavMesh();
+
+            MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>();
+            if (rend != null)
+                rend.enabled = false;
+        }
+        else
+        {
+            Debug.LogWarning("navMesh is null");
+        }
+    }
+
 }
