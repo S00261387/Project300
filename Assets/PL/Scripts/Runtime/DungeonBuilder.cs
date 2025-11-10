@@ -23,11 +23,13 @@ public class DungeonBuilder : MonoBehaviour
     //all prefabs to put in the map
     public GameObject floorPrefab; //1
     public GameObject wallPrefab; //2 for vertical and 3 for horizontal
+    public GameObject wallTorch; //no specific number because of proba to exchange with a 2 or 3
     public GameObject wallCorner; //4
     public GameObject doorPrefab; //5 vertical and 6 horizontal
-    public GameObject decorationPrefab; //7
+
+    [Header("Decorations")]
+    public List<GameObject> decorationPrefabs; // list of possible decorations for tile 7
     public GameObject libraryPrefab; //8
-    public GameObject wallTorch; //no specific number because of proba to exchange with a 2 or 3
 
     public GameObject wallHospital; //to replace the basic dungeon prefabs
     public GameObject wallTorchHospital;
@@ -138,7 +140,8 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 else if (t == 7)
                 {
-                    pf = decorationPrefab;
+                    if (decorationPrefabs != null && decorationPrefabs.Count > 0)
+                        pf = decorationPrefabs[Random.Range(0, decorationPrefabs.Count)]; //randomly select a decoration to place on that tile
                 }
                 else if (t == 8)
                 {
