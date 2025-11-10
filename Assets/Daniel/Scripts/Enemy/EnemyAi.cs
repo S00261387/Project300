@@ -9,7 +9,8 @@ public class EnemyAi: MonoBehaviour
 
     public LayerMask whatIsGround, whatIsPlayer;
 
-
+    public float DistractCd;
+    private float DistractCdTimer = 0;
 
 
 
@@ -27,18 +28,31 @@ public class EnemyAi: MonoBehaviour
     Vector3 Home;
     public float HomeRadius;
 
+    public float chaseCd;
+    private float chaseCdTimer;
+
+    [SerializeField] GameObject Question;
+    [SerializeField] GameObject Exclamation;
+
     //Searching
 
     [SerializeField] float fullAwareness;
     [SerializeField] private float halfAwareness;
     [SerializeField] private float awareness;
     public bool searchingStarted;
+
+    //Attacking
+
+    [SerializeField] private float attackDistance;
+    [SerializeField] private float attackCd;
+    private float attackCdTimer;
+    public float attackDamage;
     
 
     //Animation
     public Animator animator;
     public bool Chasing;
-    public bool Attacking;
+    public bool Attacking = false;
 
     //States
     [SerializeField] private bool Chase;
@@ -63,6 +77,11 @@ public class EnemyAi: MonoBehaviour
         fov = GetComponent<FieldOfView>();
         Home = transform.position;
         halfAwareness = fullAwareness / 2;
+        //Question = GetComponent<GameObject>();
+        //Exclamation = GetComponent<GameObject>();
+        Question.SetActive(false);
+        Exclamation.SetActive(false);
+
         //walkPoints = new Vector3[Random.Range(3, 6)];
     }
 
@@ -136,14 +155,44 @@ public class EnemyAi: MonoBehaviour
         
     }
 
+    //public void Distracted(Vector3 distractPoint)
+    //{
+    //   DistractCdTimer += Time.deltaTime;
+    //    if 
+
+    //}
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            GameObject Player = GameObject.Find("Player");
+            PlayerHealth health = Player.GetComponent<PlayerHealth>();
+            if (health != null)
+            {
+                if (!health.invincible)
+                {
+                    health.OnHit(attackDamage);
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
     private void Searching()
     {
-
+        
         //Quaternion.LookRotation(player.transform.position);
         if (!searchingStarted)
         {
             awareness = halfAwareness;
             searchingStarted = true;
+            Question.SetActive(true);
+            transform.LookAt(player);
+            agent.SetDestination(transform.position);
         }
        
         if (fov.visible)
@@ -160,6 +209,8 @@ public class EnemyAi: MonoBehaviour
             Search = false;
             searchingStarted = false;
             Chase = true;
+            Question.SetActive(false);
+            Exclamation.SetActive(true);
         }
 
         if (awareness >= fullAwareness)
@@ -167,6 +218,9 @@ public class EnemyAi: MonoBehaviour
             Search = false;
             searchingStarted = false;
             Patrol = true;
+            chaseCdTimer = chaseCd;
+            Question.SetActive(false);
+
         }
 
     }
@@ -288,12 +342,20 @@ public class EnemyAi: MonoBehaviour
             PlayedChaseSound = true;
         }
 
+        chaseCdTimer -= Time.deltaTime;
+
         agent.SetDestination(player.position);
 
-        if (!fov.visible)
+
+        if (!fov.visible && chaseCdTimer <= 0)
         {
             Chase = false;
             Search = true;
+            Exclamation.SetActive(false);
+        }
+        else if (fov.visible && chaseCdTimer <= 0)
+        {
+            chaseCdTimer = chaseCd;
         }
     }
     
