@@ -97,11 +97,41 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5104508377301008541, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5298605229133554371}
   m_SourcePrefab: {fileID: 100100000, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+--- !u!1 &1486765931594400992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5104508377301008541, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+  m_PrefabInstance: {fileID: 5941610133998929021}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5298605229133554371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486765931594400992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e387a1352accd144a847845f0f08e0fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DynamicLightController
+  lightSource: {fileID: 3707956239892013052}
+  activeDistance: 15
+  fadeSpeed: 5
+  flickerIntensity: 200
+  flickerSpeed: 3
 --- !u!4 &3060578131335060098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8650726003960717055, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+  m_PrefabInstance: {fileID: 5941610133998929021}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &3707956239892013052 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 6990035644129663873, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
   m_PrefabInstance: {fileID: 5941610133998929021}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7348857133426010713
@@ -167,13 +197,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5104508377301008541, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4765627458677978577}
   m_SourcePrefab: {fileID: 100100000, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+--- !u!108 &359719257754907096 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 6990035644129663873, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+  m_PrefabInstance: {fileID: 7348857133426010713}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2157769407171130534 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8650726003960717055, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
   m_PrefabInstance: {fileID: 7348857133426010713}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2534042195707275972 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5104508377301008541, guid: 5c6ad4bd4d852e247977bbe07e39adb1, type: 3}
+  m_PrefabInstance: {fileID: 7348857133426010713}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4765627458677978577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2534042195707275972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e387a1352accd144a847845f0f08e0fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DynamicLightController
+  lightSource: {fileID: 359719257754907096}
+  activeDistance: 15
+  fadeSpeed: 5
+  flickerIntensity: 200
+  flickerSpeed: 3
 --- !u!1001 &7559459584987608762
 PrefabInstance:
   m_ObjectHideFlags: 0
