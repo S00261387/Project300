@@ -5,7 +5,7 @@ public class EnemyAi: MonoBehaviour
 {
     public NavMeshAgent agent;
 
-    public Transform player;
+    Transform player;
 
     public LayerMask whatIsGround, whatIsPlayer;
 
@@ -67,7 +67,7 @@ public class EnemyAi: MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.Find("Player").transform;
+       
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fov = GetComponent<FieldOfView>();
@@ -75,7 +75,9 @@ public class EnemyAi: MonoBehaviour
         halfAwareness = fullAwareness / 2;
         Question.SetActive(false);
         Exclamation.SetActive(false);
-        //awareness = halfAwareness;
+        GameObject Player = GameObject.FindGameObjectWithTag("Player");
+        player = Player.transform;
+       
 
     }
 
@@ -142,7 +144,7 @@ public class EnemyAi: MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Attacking = true;
-            GameObject Player = GameObject.Find("Player");
+            GameObject Player = GameObject.FindGameObjectWithTag("Player");
             PlayerHealth health = Player.GetComponent<PlayerHealth>();
             if (health != null)
             {
