@@ -1566,7 +1566,7 @@ PrefabInstance:
       objectReference: {fileID: 1914283013}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: chaseCd
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: Question
@@ -1594,7 +1594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: fullAwareness
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: attackDistance
@@ -1602,7 +1602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: searchingStarted
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5762674291065460704, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: m_LocalPosition.x
