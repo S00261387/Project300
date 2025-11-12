@@ -5,39 +5,64 @@ public class DynamicLightController : MonoBehaviour
     [Header("Light Settings")]
     public Light lightSource;
     public float activeDistance = 15f;   // Distance to activate light
-    public float fadeSpeed = 2f;
-    public float flickerIntensity = 0.3f;
-    public float flickerSpeed = 5f;
+    public float fadeSpeed = 2f;         // How fast the light fades in/out
 
     private Transform player;
     private float baseIntensity;
     private float targetIntensity;
+    private bool initialized = false;
+
+    void Awake()
+    {
+        if (!lightSource)
+            lightSource = GetComponentInChildren<Light>();
+
+        if (lightSource)
+            baseIntensity = lightSource.intensity; // Save the prefab’s true intensity
+    }
 
     void Start()
     {
-        if (lightSource == null)
-            lightSource = GetComponentInChildren<Light>();
-
-        if (lightSource != null)
-        {
-            baseIntensity = lightSource.intensity;
-            lightSource.intensity = 0f;
-        }
-
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        // Start turned off (for fading logic)
+        if (lightSource)
+            lightSource.intensity = 0f;
+
+        initialized = true;
     }
 
     void Update()
     {
-        if (player == null || lightSource == null) return;
+        if (!initialized || !lightSource) return;
+
+        // If player not yet found (e.g. spawned later)
+        if (!player)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj)
+                player = playerObj.transform;
+            else
+                return;
+        }
 
         float dist = Vector3.Distance(player.position, transform.position);
         bool shouldBeOn = dist < activeDistance;
 
-        float flicker = Mathf.PerlinNoise(Time.time * flickerSpeed, 0f) * flickerIntensity; //perline noise is a type of noise like gradient
+        targetIntensity = shouldBeOn ? baseIntensity : 0f;
 
-        targetIntensity = shouldBeOn ? baseIntensity + flicker : 0f;
+        // Smooth fade
+        lightSource.intensity = Mathf.Lerp(
+            lightSource.intensity,
+            targetIntensity,
+            Time.deltaTime * fadeSpeed
+        );
+    }
 
-        lightSource.intensity = Mathf.Lerp(lightSource.intensity, targetIntensity, Time.deltaTime * fadeSpeed);
+    void OnDisable()
+    {
+        // Reset to base intensity if script removed or object disabled
+        if (lightSource)
+            lightSource.intensity = baseIntensity;
     }
 }
