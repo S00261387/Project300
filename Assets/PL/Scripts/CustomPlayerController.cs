@@ -21,13 +21,14 @@ public class CustomPlayerController : MonoBehaviour
     private CharacterController controller;
     private float verticalLookRotation = 0f;
 
+    private Renderer[] playerRenderers;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         if (playerCamera == null)
             playerCamera = Camera.main;
 
-        // Ensure camera starts above the player
         if (!isFirstPerson && playerCamera != null)
         {
             playerCamera.transform.SetParent(null);
@@ -37,6 +38,8 @@ public class CustomPlayerController : MonoBehaviour
 
         animator = GetComponent<Animator>();
         Debug.Log("Animator found on: " + animator.gameObject.name); // test_____________________________________________________________________________________________________
+
+        playerRenderers = GetComponentsInChildren<Renderer>(true);
     }
 
     void Update()
@@ -61,6 +64,9 @@ public class CustomPlayerController : MonoBehaviour
                 playerCamera.transform.localPosition = Vector3.zero;
                 playerCamera.transform.localRotation = Quaternion.identity;
                 Cursor.lockState = CursorLockMode.Locked;
+
+                foreach (var r in playerRenderers) //mesh not visible in first person
+                    r.enabled = false;
             }
             else
             {
@@ -68,6 +74,9 @@ public class CustomPlayerController : MonoBehaviour
                 playerCamera.transform.position = transform.position + Vector3.up * 10f;
                 playerCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 Cursor.lockState = CursorLockMode.None;
+
+                foreach (var r in playerRenderers) //mesh visible again for third person
+                    r.enabled = true;
             }
         }
     }
@@ -81,7 +90,7 @@ public class CustomPlayerController : MonoBehaviour
 
         controller.SimpleMove(move * moveSpeed);
 
-        // Rotate toward mouse
+        // look at mouse
         Plane plane = new Plane(Vector3.up, Vector3.zero);
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         if (plane.Raycast(ray, out float distance))
@@ -96,14 +105,12 @@ public class CustomPlayerController : MonoBehaviour
             }
         }
 
-        // Animation relative to look direction
         if (move.sqrMagnitude < 0.01f)
         {
             animator.Play("Idle");
         }
         else
         {
-            // Convert world movement to local (relative to facing)
             Vector3 localMove = transform.InverseTransformDirection(move);
 
             if (Mathf.Abs(localMove.z) > Mathf.Abs(localMove.x))
@@ -122,7 +129,6 @@ public class CustomPlayerController : MonoBehaviour
             }
         }
 
-        // Keep camera over player, even when idle
         if (playerCamera != null)
         {
             Vector3 camPos = playerCamera.transform.position;
