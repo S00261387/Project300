@@ -9,8 +9,9 @@ public class EnemyAi: MonoBehaviour
 
     public LayerMask whatIsGround, whatIsPlayer;
 
+    public float DistractRadius;
     public float DistractCd;
-    private float DistractCdTimer = 0;
+   [SerializeField] private float DistractCdTimer = 0;
 
 
 
@@ -54,6 +55,7 @@ public class EnemyAi: MonoBehaviour
     [SerializeField] private bool Chase;
     [SerializeField] private bool Search;
     [SerializeField] private bool Patrol;
+    [SerializeField] private bool Distract;
 
     //Audio
     [SerializeField] private AudioClip[] IdleAudios;
@@ -67,7 +69,7 @@ public class EnemyAi: MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.Find("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fov = GetComponent<FieldOfView>();
@@ -95,19 +97,28 @@ public class EnemyAi: MonoBehaviour
             SoundDelayTimer -= Time.deltaTime;
         }
 
+        if (Distract && DistractCdTimer < DistractCd)
+        {
+            DistractCdTimer += Time.deltaTime;
+        }
+
         animator.SetFloat("Speed", agent.desiredVelocity.sqrMagnitude);
         animator.SetBool("Chasing", Chasing);
         animator.SetBool("Attacking", Attacking);
 
-        if (!Search && !Chase)
+        if (!Search && !Chase && !Distract)
         {
             Patrol = true;
         }
- 
+        else
+        {
+            Patrol = false;
+        }
+
         if (fov.visible && !Chase)
         {
             Patrol = false;
-           Search = true;
+            Search = true;
         }
 
         if (Chase)
@@ -130,19 +141,35 @@ public class EnemyAi: MonoBehaviour
         
     }
 
-    //public void Distracted(Vector3 distractPoint)
-    //{
-    //   DistractCdTimer += Time.deltaTime;
-    //    if 
+    public void Distracted(Vector3 distractPoint)
+    {
+        if (!Chase && !Search)
+        {
+            Distract = true;
+            transform.LookAt(distractPoint);
+            agent.isStopped = true;
+            Question.SetActive(true);
+            if (DistractCdTimer >= DistractCd)
+            {
+                DistractCdTimer = 0;
+                agent.isStopped = false;
+                agent.SetDestination(distractPoint);
+                if (Vector3.Distance(transform.position, distractPoint) <= 3)
+                {
+                    Distract = false;
+                    Question.SetActive(false);
+                }
+            }
+        }
 
-    //}
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
         {
             Attacking = true;
-            GameObject Player = GameObject.Find("Player");
+            GameObject Player = GameObject.FindGameObjectWithTag("Player");
             PlayerHealth health = Player.GetComponent<PlayerHealth>();
             if (health != null)
             {
