@@ -14,14 +14,17 @@ public class Distratable : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
        rb.isKinematic = true;
+
+        gameObject.layer = 8;
         if (collision.gameObject.tag != ("Enemy"))
         {
+           
             foreach (GameObject enemy in Enemies)
             {
                 EnemyAi ai = enemy.GetComponent<EnemyAi>();
                 if (Vector3.Distance(transform.position, enemy.transform.position) <= ai.DistractRadius)
                 {
-                    ai.Distracted(transform.position);
+                    ai.Alert(transform.position);
                 }
             }
         }

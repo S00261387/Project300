@@ -12,6 +12,7 @@ public class EnemyAi: MonoBehaviour
     public float DistractRadius;
     public float DistractCd;
    [SerializeField] private float DistractCdTimer = 0;
+    private Vector3 distractSource;
 
 
 
@@ -118,6 +119,7 @@ public class EnemyAi: MonoBehaviour
         if (fov.visible && !Chase)
         {
             Patrol = false;
+            Distract = false;
             Search = true;
         }
 
@@ -136,31 +138,47 @@ public class EnemyAi: MonoBehaviour
             Chasing = false;
             Patrolling();
         }
+        if (Distract)
+        {
+            Distracted();
+        }
        
 
         
     }
 
-    public void Distracted(Vector3 distractPoint)
+    public void Alert(Vector3 distractPoint)
     {
-        if (!Chase && !Search)
+        if (Patrol)
         {
             Distract = true;
-            transform.LookAt(distractPoint);
+            Patrol = false;
+            distractSource = distractPoint;
             agent.isStopped = true;
+            transform.LookAt(distractPoint);    
             Question.SetActive(true);
+        }
+    }
+
+
+  private void Distracted()
+    {
+      
+          
             if (DistractCdTimer >= DistractCd)
             {
-                DistractCdTimer = 0;
+                
                 agent.isStopped = false;
-                agent.SetDestination(distractPoint);
-                if (Vector3.Distance(transform.position, distractPoint) <= 3)
+                agent.SetDestination(distractSource);
+                if (Vector3.Distance(transform.position, distractSource) <= 2)
                 {
                     Distract = false;
+                    Patrol = true;
                     Question.SetActive(false);
+                    DistractCdTimer = 0;
                 }
             }
-        }
+        
 
     }
 
