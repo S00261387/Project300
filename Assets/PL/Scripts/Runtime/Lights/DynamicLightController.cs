@@ -11,7 +11,7 @@ public class DynamicLightController : MonoBehaviour
     private float baseIntensity;
     private float targetIntensity;
     private bool initialized = false;
-    /*
+    
 
     void Awake()
     {
@@ -65,5 +65,5 @@ public class DynamicLightController : MonoBehaviour
         // Reset to base intensity if script removed or object disabled
         if (lightSource)
             lightSource.intensity = baseIntensity;
-    }*/
+    }
 }

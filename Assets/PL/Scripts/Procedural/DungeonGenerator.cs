@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+#pragma warning disable UDR0001
 
 public static class DungeonGenerator
 {

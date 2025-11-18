@@ -1,4 +1,5 @@
 using UnityEngine;
+#pragma warning disable UDR0001
 
 public class GameManager : MonoBehaviour
 {

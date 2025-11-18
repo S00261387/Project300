@@ -3,6 +3,7 @@ using Unity.AI.Navigation;
 using UnityEngine.AI;
 using System.Collections;
 using System.Collections.Generic;
+#pragma warning disable UDR0001
 
 public class DungeonBuilder : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class DungeonBuilder : MonoBehaviour
     static Vector2Int playerSpawn = Vector2Int.zero; //spawnPoint
     public GameObject Player; //999
     public GameObject EnemyPrefab; //88
-
 
     //all prefabs to put in the map
     public GameObject floorPrefab; //1
@@ -38,7 +38,6 @@ public class DungeonBuilder : MonoBehaviour
 
     //proba of spawning torches
     [Range(0, 100)] public int torchChance = 5;
-    [Range(0f, 100f)] public float sanity = 0f; //for testing, I have to move that in a player controller when we merge branches
 
     private List<GameObject> normalWalls = new List<GameObject>(); //to know all the walls i have
     private List<GameObject> torchWalls = new List<GameObject>(); //same with light walls
@@ -82,6 +81,7 @@ public class DungeonBuilder : MonoBehaviour
         }
         PlacePlayer(playerSpawn); //tp player to spawn
     }
+
     void Update()
     {
         UpdateMapWithSanity();
@@ -89,8 +89,6 @@ public class DungeonBuilder : MonoBehaviour
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
     {
-        //bool PlayerSpawned = false;
-        //need to create a random to spawn player?____________________________________________________________________________________________________________________still in progress
         int h = map.GetLength(0);
         int w = map.GetLength(1);
         int y = 0;
@@ -191,6 +189,9 @@ public class DungeonBuilder : MonoBehaviour
 
     void UpdateMapWithSanity()
     {
+        if (SanityManager.Instance == null) return;
+        float sanity = SanityManager.Instance.sanity;
+
         if (sanity > 50 && !hospitalWallsActive)
         {
             SwapPrefabs(normalWalls, wallHospital);
@@ -213,6 +214,7 @@ public class DungeonBuilder : MonoBehaviour
             hospitalTorchsActive = false;
         }
     }
+
     void PlacePlayer(Vector2Int spawnTile) //teleport player to spawn position
     {
         if (Player == null)
@@ -289,5 +291,4 @@ public class DungeonBuilder : MonoBehaviour
             Debug.LogWarning("navMesh is null");
         }
     }
-
 }

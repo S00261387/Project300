@@ -127,6 +127,68 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &1993362093286667418
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5849862003331685503}
+  - component: {fileID: 5772883859553106357}
+  - component: {fileID: 4964077126374267616}
+  m_Layer: 0
+  m_Name: LightZone
+  m_TagString: LightZone
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5849862003331685503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993362093286667418}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8581103166513811047}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5772883859553106357
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993362093286667418}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!135 &4964077126374267616
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993362093286667418}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4640072324497213746
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,6 +351,7 @@ Transform:
   - {fileID: 6440431813731673515}
   - {fileID: 1694552048968540421}
   - {fileID: 505161704099148729}
+  - {fileID: 5849862003331685503}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &4510680295952991510
@@ -377,33 +440,8 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7993269890754138690}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8201228747264646364}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc8f3955c063af240afd23143f496335, type: 3}
---- !u!1 &505161704098777389 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
-  m_PrefabInstance: {fileID: 505161704098947011}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8201228747264646364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 505161704098777389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e387a1352accd144a847845f0f08e0fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DynamicLightController
-  lightSource: {fileID: 8534950376236721472}
-  activeDistance: 15
-  fadeSpeed: 5
-  flickerIntensity: 0.3
-  flickerSpeed: 5
 --- !u!4 &505161704099148729 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
@@ -553,33 +591,8 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6203589427801024841}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3974368468233855821}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc8f3955c063af240afd23143f496335, type: 3}
---- !u!1 &1694552048968375185 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
-  m_PrefabInstance: {fileID: 1694552048968207743}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3974368468233855821
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1694552048968375185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e387a1352accd144a847845f0f08e0fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DynamicLightController
-  lightSource: {fileID: 7598733390410950798}
-  activeDistance: 15
-  fadeSpeed: 5
-  flickerIntensity: 0.3
-  flickerSpeed: 5
 --- !u!4 &1694552048968540421 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}

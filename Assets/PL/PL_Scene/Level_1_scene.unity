@@ -119,6 +119,54 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &721744677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 721744679}
+  - component: {fileID: 721744678}
+  m_Layer: 0
+  m_Name: SanityManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &721744678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721744677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e221f8d3ccac17348a0a117a2054284d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SanityManager
+  sanity: 52.4
+  drainRateInDarkness: 0.5
+  isInDarkness: 0
+  postProcessVolume: {fileID: 1440745343}
+--- !u!4 &721744679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721744677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1103292109
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,6 +299,39 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5742262029142546584, guid: 9a7ef1c560d3fed46a398073b36ea028, type: 3}
   m_PrefabInstance: {fileID: 2920673142643118630}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1288011368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288011367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef50006c6ab192a48a93442ab3caa277, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLightDetector
+--- !u!135 &1288011369
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288011367}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.4
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1 &1321894348
 GameObject:
   m_ObjectHideFlags: 0
@@ -597,8 +678,7 @@ MonoBehaviour:
   wallHospital: {fileID: 2421902578710628384, guid: 766a6e648bc75c547ad9fa352b040a11, type: 3}
   wallTorchHospital: {fileID: 5133983182189626621, guid: cc75a75a80d51c54cb37152129c72f22, type: 3}
   EscapePrefab: {fileID: 3055551850030303151, guid: e4d586e5726edb941ab7765ae16a0c7e, type: 3}
-  torchChance: 3
-  sanity: 0
+  torchChance: 4
   navMeshCube: {fileID: 2080794216794678436}
 --- !u!4 &1814768258
 Transform:
@@ -676,10 +756,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5742262029142546584, guid: 9a7ef1c560d3fed46a398073b36ea028, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5742262029142546584, guid: 9a7ef1c560d3fed46a398073b36ea028, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1288011368}
+    - targetCorrespondingSourceObject: {fileID: 5742262029142546584, guid: 9a7ef1c560d3fed46a398073b36ea028, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1288011369}
   m_SourcePrefab: {fileID: 100100000, guid: 9a7ef1c560d3fed46a398073b36ea028, type: 3}
 --- !u!1001 &8209057015082263298
 PrefabInstance:
@@ -757,3 +847,4 @@ SceneRoots:
   - {fileID: 1440745344}
   - {fileID: 1321894350}
   - {fileID: 2920673142643118630}
+  - {fileID: 721744679}
