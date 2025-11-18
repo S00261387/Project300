@@ -20,8 +20,9 @@ public class CustomPlayerController : MonoBehaviour
 
     private CharacterController controller;
     private float verticalLookRotation = 0f;
-
     private Renderer[] playerRenderers;
+
+    private string currentAnimation = "";
 
     void Start()
     {
@@ -37,8 +38,6 @@ public class CustomPlayerController : MonoBehaviour
         }
 
         animator = GetComponent<Animator>();
-        Debug.Log("Animator found on: " + animator.gameObject.name); // test_____________________________________________________________________________________________________
-
         playerRenderers = GetComponentsInChildren<Renderer>(true);
     }
 
@@ -65,7 +64,7 @@ public class CustomPlayerController : MonoBehaviour
                 playerCamera.transform.localRotation = Quaternion.identity;
                 Cursor.lockState = CursorLockMode.Locked;
 
-                foreach (var r in playerRenderers) //mesh not visible in first person
+                foreach (var r in playerRenderers)
                     r.enabled = false;
             }
             else
@@ -75,7 +74,7 @@ public class CustomPlayerController : MonoBehaviour
                 playerCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 Cursor.lockState = CursorLockMode.None;
 
-                foreach (var r in playerRenderers) //mesh visible again for third person
+                foreach (var r in playerRenderers)
                     r.enabled = true;
             }
         }
@@ -90,7 +89,7 @@ public class CustomPlayerController : MonoBehaviour
 
         controller.SimpleMove(move * moveSpeed);
 
-        // look at mouse
+        // Look at mouse
         Plane plane = new Plane(Vector3.up, Vector3.zero);
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         if (plane.Raycast(ray, out float distance))
@@ -105,30 +104,31 @@ public class CustomPlayerController : MonoBehaviour
             }
         }
 
-        if (move.sqrMagnitude < 0.01f)
-        {
-            animator.Play("Idle");
-        }
-        else
+        // Animation control
+        string newAnim = "Idle";
+
+        if (move.sqrMagnitude >= 0.01f)
         {
             Vector3 localMove = transform.InverseTransformDirection(move);
 
             if (Mathf.Abs(localMove.z) > Mathf.Abs(localMove.x))
             {
-                if (localMove.z > 0f)
-                    animator.Play("WalkForward"); //testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                else
-                    animator.Play("WalkBackward");
+                newAnim = (localMove.z > 0f) ? "WalkForward" : "WalkBackward";
             }
             else
             {
-                if (localMove.x > 0f)
-                    animator.Play("WalkRight");
-                else
-                    animator.Play("WalkLeft");
+                newAnim = (localMove.x > 0f) ? "WalkRight" : "WalkLeft";
             }
         }
 
+        // Only change animation if it's different
+        if (newAnim != currentAnimation)
+        {
+            currentAnimation = newAnim;
+            animator.CrossFade(currentAnimation, 0.15f);
+        }
+
+        // Keep camera following player
         if (playerCamera != null)
         {
             Vector3 camPos = playerCamera.transform.position;
