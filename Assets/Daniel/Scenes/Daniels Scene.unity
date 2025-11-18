@@ -1766,7 +1766,7 @@ PrefabInstance:
       objectReference: {fileID: 1697560367}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: MoveCd
-      value: 1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: player
@@ -1834,7 +1834,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5762674291065460704, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.263302
+      value: 12.538301
       objectReference: {fileID: 0}
     - target: {fileID: 5762674291065460704, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1842,7 +1842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5762674291065460704, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.3697348
+      value: -11.650059
       objectReference: {fileID: 0}
     - target: {fileID: 5762674291065460704, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: m_LocalRotation.w

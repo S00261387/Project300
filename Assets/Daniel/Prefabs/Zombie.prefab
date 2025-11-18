@@ -876,13 +876,33 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 128
+  DistractRadius: 0
+  DistractCd: 0
+  DistractCdTimer: 0
   walkPoints: []
+  nextWalkPoint: {x: 0, y: 0, z: 0}
+  walkPoint: {x: 0, y: 0, z: 0}
+  walkPointSet: 0
   walkPointRange: 10
-  MoveCd: 5
+  MoveCd: 10
   HomeRadius: 10
+  chaseCd: 0
+  Question: {fileID: 0}
+  Exclamation: {fileID: 0}
+  fullAwareness: 0
+  halfAwareness: 0
+  awareness: 0
+  searchingStarted: 0
+  attackDistance: 0
+  attackCd: 0
+  attackDamage: 0
   animator: {fileID: 7030632308330798440}
   Chasing: 0
   Attacking: 1
+  Chase: 0
+  Search: 0
+  Patrol: 0
+  Distract: 0
   IdleAudios:
   - {fileID: 8300000, guid: 490a1f1119d82aa48b1065b7923ec27b, type: 3}
   - {fileID: 8300000, guid: a3bd79e89105c70449fffa697b29fde9, type: 3}

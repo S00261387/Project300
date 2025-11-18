@@ -15,9 +15,22 @@ public class EnemyAi: MonoBehaviour
     private Vector3 distractSource;
 
 
+   
+
+
+
+    public Vector3[] walkPoints;
+
+    private Vector3 currentWalkPoint;
+
+    public Vector3 nextWalkPoint;
+
+    bool walkPointsSet = false;
+
+    private int currentPoint = 0;
 
     //Patroling
-   
+
     public Vector3 walkPoint;
     public bool walkPointSet = false;
     public float walkPointRange;
@@ -78,6 +91,7 @@ public class EnemyAi: MonoBehaviour
         halfAwareness = fullAwareness / 2;
         Question.SetActive(false);
         Exclamation.SetActive(false);
+        walkPoints = new Vector3[4];
         //awareness = halfAwareness;
 
     }
@@ -86,7 +100,6 @@ public class EnemyAi: MonoBehaviour
     {
      
         fov.FindVisibleTargets();
-       
 
         if (MoveCdTimer > 0)
         {
@@ -270,55 +283,131 @@ public class EnemyAi: MonoBehaviour
             PlayedChaseSound = false;
         }
 
-        if (!walkPointSet)
+        //if (!walkPointSet)
+        //{
+        //    SearchWalkPoint();
+        //}
+
+        //if (walkPointSet)
+        //{
+        //    if (MoveCdTimer > 0)
+        //    {
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        MoveCdTimer = MoveCd;
+
+        //        agent.isStopped = false;
+
+        //        agent.SetDestination(walkPoint);
+
+        //        Vector3 distanceToWalkPoint = transform.position - walkPoint;
+
+        //        if (distanceToWalkPoint.magnitude < 2f)
+        //        {
+        //            walkPointSet = false;
+        //            agent.isStopped = true;
+        //        }
+        //    }
+        //}
+        //else { return; }
+
+        if (!walkPointsSet)
         {
-            SearchWalkPoint();
+            walkPoints = SearchWalkPoint(walkPoints);
         }
 
-        if (walkPointSet)
+        if (walkPointsSet)
         {
             if (MoveCdTimer > 0)
             {
                 return;
             }
+
             else
             {
+               
+
                 MoveCdTimer = MoveCd;
 
-                agent.isStopped = false;
+                agent.SetDestination(walkPoints[currentPoint]);
 
-                agent.SetDestination(walkPoint);
+                Vector3 distanceToWalkPoint = transform.position - walkPoints[currentPoint];
 
-                Vector3 distanceToWalkPoint = transform.position - walkPoint;
+                //if (distanceToWalkPoint.magnitude < 0.5f)
+                //{
+                //    MoveCdTimer = MoveCd;
+                //    agent.isStopped = true;
+                //}
 
-                if (distanceToWalkPoint.magnitude < 2f)
+                if (currentPoint == walkPoints.Length - 1)
                 {
-                    walkPointSet = false;
-                    agent.isStopped = true;
+                    currentPoint = 0;
+                }
+
+                else
+                {      
+                    currentPoint++;
                 }
             }
         }
-        else { return; }
-
     }
 
-    private void SearchWalkPoint()
+    //private void SearchWalkPoint()
+    //{
+    //    do
+    //    {
+    //        float randomZ = Random.Range(-walkPointRange, walkPointRange);
+    //        float randomX = Random.Range(-walkPointRange, walkPointRange);
+
+    //        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+    //        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(transform.position, walkPoint) >= walkPointRange / 2)
+    //        {
+    //            walkPointSet = true;
+    //        }
+    //    }
+    //    while (!walkPointSet);
+
+
+    //}
+
+    private Vector3[] SearchWalkPoint(Vector3[] WalkPoints)
     {
-        do
+        bool walkPointValid;
+
+        for (int i = 0; i < WalkPoints.Length; i++)
         {
-            float randomZ = Random.Range(-walkPointRange, walkPointRange);
-            float randomX = Random.Range(-walkPointRange, walkPointRange);
+            walkPointValid = false;
 
-            walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-            if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(transform.position, walkPoint) >= walkPointRange / 2)
+            do
             {
-                walkPointSet = true;
-            }
-        }
-        while (!walkPointSet);
-  
+                if (i == 0)
+                {
+                    WalkPoints[i] = transform.position;
+                    walkPointValid = true;
+                }
 
+                else
+                {
+                    float randomZ = Random.Range(-walkPointRange, walkPointRange);
+                    float randomX = Random.Range(-walkPointRange, walkPointRange);
+
+                    Vector3 walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+                    if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(WalkPoints[i - 1], walkPoint) >= walkPointRange / 2 && Vector3.Distance(walkPoint, Home) <= HomeRadius)
+                    {
+                        WalkPoints[i] = walkPoint;
+                        walkPointValid = true;
+                    }
+                    //Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(WalkPoints[i - 1], walkPoint) <= walkPointRange;
+                }
+            }
+            while (!walkPointValid);
+        }
+        walkPointsSet = true;
+        return WalkPoints;
     }
 
 
