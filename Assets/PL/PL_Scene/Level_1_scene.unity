@@ -149,7 +149,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SanityManager
   sanity: 52.4
+  maxSanity: 10
   drainRateInDarkness: 0.5
+  recoverRateInLight: 1
   isInDarkness: 0
   postProcessVolume: {fileID: 1440745343}
 --- !u!4 &721744679
