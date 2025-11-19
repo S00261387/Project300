@@ -84,11 +84,18 @@ public class DungeonBuilder : MonoBehaviour
 
     void Update()
     {
-        UpdateMapWithSanity();
+        // removed UpdateMapWithSanity();
+        // sanity-based prefabs are now chosen directly at generation time
     }
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
     {
+        bool isHospitalTheme = false;
+        if (SanityManager.Instance != null)
+        {
+            isHospitalTheme = SanityManager.Instance.sanity > 50f; //choose theme based on sanity when floor is generated
+        }
+
         int h = map.GetLength(0);
         int w = map.GetLength(1);
         int y = 0;
@@ -108,17 +115,17 @@ public class DungeonBuilder : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0, 90, 0);
                     if (wallTorch != null && Random.Range(0, 100) < torchChance)
-                        pf = wallTorch;
+                        pf = isHospitalTheme ? wallTorchHospital : wallTorch;
                     else
-                        pf = wallPrefab;
+                        pf = isHospitalTheme ? wallHospital : wallPrefab;
                 }
                 else if (t == 3)
                 {
                     rot = Quaternion.identity;
                     if (wallTorch != null && Random.Range(0, 100) < torchChance)
-                        pf = wallTorch;
+                        pf = isHospitalTheme ? wallTorchHospital : wallTorch;
                     else
-                        pf = wallPrefab;
+                        pf = isHospitalTheme ? wallHospital : wallPrefab;
                 }
                 else if (t == 4)
                 {
@@ -126,13 +133,11 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 else if (t == 5)
                 {
-
                     rot = Quaternion.Euler(0, 90, 0);
                     pf = doorPrefab;
                 }
                 else if (t == 6)
                 {
-
                     rot = Quaternion.identity;
                     pf = doorPrefab;
                 }
@@ -159,9 +164,9 @@ public class DungeonBuilder : MonoBehaviour
                 if (pf != null)
                 {
                     GameObject obj = Instantiate(pf, new Vector3(x, 0f, y), rot, transform); //spawn chosen prefab at coordinate x,0,y with rotation for vertical or horizontal
-                    if (pf == wallPrefab)
+                    if (pf == wallPrefab || pf == wallHospital)
                         normalWalls.Add(obj);
-                    else if (pf == wallTorch)
+                    else if (pf == wallTorch || pf == wallTorchHospital)
                         torchWalls.Add(obj);
                 }
                 x++;
@@ -184,34 +189,6 @@ public class DungeonBuilder : MonoBehaviour
             GameObject newObj = Instantiate(newPrefab, pos, rot, parent);
             Destroy(old);
             list[i] = newObj;
-        }
-    }
-
-    void UpdateMapWithSanity()
-    {
-        if (SanityManager.Instance == null) return;
-        float sanity = SanityManager.Instance.sanity;
-
-        if (sanity > 50 && !hospitalWallsActive)
-        {
-            SwapPrefabs(normalWalls, wallHospital);
-            hospitalWallsActive = true;
-        }
-        else if (sanity <= 50 && hospitalWallsActive)
-        {
-            SwapPrefabs(normalWalls, wallPrefab);
-            hospitalWallsActive = false;
-        }
-
-        if (sanity > 70 && !hospitalTorchsActive)
-        {
-            SwapPrefabs(torchWalls, wallTorchHospital);
-            hospitalTorchsActive = true;
-        }
-        else if (sanity <= 70 && hospitalTorchsActive)
-        {
-            SwapPrefabs(torchWalls, wallTorch);
-            hospitalTorchsActive = false;
         }
     }
 
