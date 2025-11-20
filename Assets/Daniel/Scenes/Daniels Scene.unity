@@ -1766,7 +1766,7 @@ PrefabInstance:
       objectReference: {fileID: 1697560367}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: MoveCd
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: player

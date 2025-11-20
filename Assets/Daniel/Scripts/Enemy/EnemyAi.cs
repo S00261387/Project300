@@ -35,7 +35,8 @@ public class EnemyAi: MonoBehaviour
     public bool walkPointSet = false;
     public float walkPointRange;
     public float MoveCd;
-    private float MoveCdTimer;
+    [SerializeField] private float MoveCdTimer;
+    [SerializeField] private bool NotMoving;
     Vector3 Home;
     public float HomeRadius;
 
@@ -101,7 +102,7 @@ public class EnemyAi: MonoBehaviour
      
         fov.FindVisibleTargets();
 
-        if (MoveCdTimer > 0)
+        if (MoveCdTimer > 0 && NotMoving)
         {
             MoveCdTimer -= Time.deltaTime;
         }
@@ -166,6 +167,7 @@ public class EnemyAi: MonoBehaviour
         {
             Distract = true;
             Patrol = false;
+            NotMoving = false;
             distractSource = distractPoint;
             agent.isStopped = true;
             transform.LookAt(distractPoint);    
@@ -227,6 +229,7 @@ public class EnemyAi: MonoBehaviour
 
         if (!searchingStarted)
         {
+            NotMoving = false;
             awareness = halfAwareness;          
             Question.SetActive(true);
             transform.LookAt(player);
@@ -258,6 +261,7 @@ public class EnemyAi: MonoBehaviour
             Search = false;
             searchingStarted = false;
             Patrol = true;
+            agent.isStopped = false;
             chaseCdTimer = chaseCd;
             Question.SetActive(false);
 
@@ -319,38 +323,37 @@ public class EnemyAi: MonoBehaviour
         }
 
         if (walkPointsSet)
-        {
-            if (MoveCdTimer > 0)
-            {
-                return;
-            }
-
-            else
-            {
-               
-
-                MoveCdTimer = MoveCd;
-
+        {  
                 agent.SetDestination(walkPoints[currentPoint]);
 
                 Vector3 distanceToWalkPoint = transform.position - walkPoints[currentPoint];
 
-                //if (distanceToWalkPoint.magnitude < 0.5f)
-                //{
-                //    MoveCdTimer = MoveCd;
-                //    agent.isStopped = true;
-                //}
-
-                if (currentPoint == walkPoints.Length - 1)
+                if (distanceToWalkPoint.magnitude < 0.5f)
                 {
-                    currentPoint = 0;
-                }
+                    NotMoving = true;
+                    agent.isStopped = true;
 
-                else
-                {      
-                    currentPoint++;
+                    if (MoveCdTimer > 0)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                    NotMoving = false;
+                    agent.isStopped = false;
+                    MoveCdTimer = MoveCd;
+                        if (currentPoint == walkPoints.Length - 1)
+                        {
+                            currentPoint = 0;
+                        }
+
+                        else
+                        {
+                            currentPoint++;
+                        }
+                    }
+                
                 }
-            }
         }
     }
 
@@ -401,7 +404,7 @@ public class EnemyAi: MonoBehaviour
                         WalkPoints[i] = walkPoint;
                         walkPointValid = true;
                     }
-                    //Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(WalkPoints[i - 1], walkPoint) <= walkPointRange;
+                
                 }
             }
             while (!walkPointValid);
