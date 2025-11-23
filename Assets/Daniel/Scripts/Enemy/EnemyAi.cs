@@ -15,7 +15,7 @@ public class EnemyAi: MonoBehaviour
     private Vector3 distractSource;
 
 
-   
+    public bool testHit;
 
 
 
@@ -65,6 +65,7 @@ public class EnemyAi: MonoBehaviour
     public Animator animator;
     public bool Chasing;
     public bool Attacking = false;
+    public bool Dead;
 
     //States
     [SerializeField] private bool Chase;
@@ -78,6 +79,10 @@ public class EnemyAi: MonoBehaviour
     [SerializeField] private float SoundDelay = 10;
     private float SoundDelayTimer;
     private bool PlayedChaseSound;
+
+    //Health
+    public float Health;
+    public float deathCd;
 
     //FOV
     public FieldOfView fov;
@@ -120,6 +125,29 @@ public class EnemyAi: MonoBehaviour
         animator.SetFloat("Speed", agent.desiredVelocity.sqrMagnitude);
         animator.SetBool("Chasing", Chasing);
         animator.SetBool("Attacking", Attacking);
+        animator.SetBool("Dead", Dead);
+
+        if (Health <= 0)
+        {
+            Dead = true;
+            fov.viewMeshFilter.sharedMesh = null;
+            Search = false;
+            Patrol = false;
+            Chase = false;
+            Distract = false;
+            agent.isStopped = true;
+            CapsuleCollider C = GetComponent<CapsuleCollider>();
+            C.enabled = false;
+            Question.SetActive(false);
+            Exclamation.SetActive(false);
+            //deathCd -= Time.deltaTime;
+            //if (deathCd <= 0)
+            //{
+            //    Destroy(this.gameObject);
+            //}
+
+        }
+
 
         if (!Search && !Chase && !Distract)
         {
@@ -137,28 +165,37 @@ public class EnemyAi: MonoBehaviour
             Search = true;
         }
 
-        if (Chase)
+        if (Chase && !Dead)
         {
             Chasing = true;
             ChasePlayer();
         }
-        if (Search)
+        if (Search && !Dead)
         {
             Chasing = false;
             Searching();
         }
-        if (Patrol)
+        if (Patrol && !Dead)
         {
             Chasing = false;
             Patrolling();
         }
-        if (Distract)
+        if (Distract && !Dead)
         {
             Distracted();
         }
        
-
+        if (testHit)
+        {
+            testHit = false;
+            OnHit(20);
+        }
         
+    }
+
+    public void OnHit(float damage)
+    {
+        Health -= damage;
     }
 
     public void Alert(Vector3 distractPoint)

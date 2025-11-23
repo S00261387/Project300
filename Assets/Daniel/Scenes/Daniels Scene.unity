@@ -1765,6 +1765,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1697560367}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
+      propertyPath: Health
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: MoveCd
       value: 2
       objectReference: {fileID: 0}
@@ -1775,6 +1779,10 @@ PrefabInstance:
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: chaseCd
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
+      propertyPath: deathCd
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5397637422968114379, guid: 7922460582f0bc340a7afa32f2368619, type: 3}
       propertyPath: Question
