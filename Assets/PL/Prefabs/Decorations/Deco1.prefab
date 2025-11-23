@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8178808635798344359}
   - component: {fileID: 8990970432279271190}
   - component: {fileID: 2649790375153410331}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Deco1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,6 +140,14 @@ PrefabInstance:
     - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_Name
       value: Floor Variant 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6761761746085810003, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7813690785318537795, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_LocalPosition.x

@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Beam
       objectReference: {fileID: 0}
+    - target: {fileID: 2850963656958657758, guid: 92daf0a8c08653f4f8e79a0318a99c88, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8667298552939636791, guid: 92daf0a8c08653f4f8e79a0318a99c88, type: 3}
       propertyPath: m_LocalScale.y
       value: 9
@@ -126,6 +130,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3445938774301559819, guid: ae27c85854975c9408276b3d559e8086, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7218116396704971793, guid: ae27c85854975c9408276b3d559e8086, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -137,6 +145,10 @@ PrefabInstance:
     - target: {fileID: 8702697628268734450, guid: ae27c85854975c9408276b3d559e8086, type: 3}
       propertyPath: m_Name
       value: Deco3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8702697628268734450, guid: ae27c85854975c9408276b3d559e8086, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8702697628268734450, guid: ae27c85854975c9408276b3d559e8086, type: 3}
       propertyPath: m_IsActive

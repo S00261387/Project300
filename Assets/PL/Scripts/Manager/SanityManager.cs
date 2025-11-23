@@ -94,4 +94,9 @@ public class SanityManager : MonoBehaviour
     {
         sanity = maxSanity;
     }
+
+    public void DrainSanity(float amount)
+    {
+        sanity = Mathf.Max(0, sanity - amount);
+    }
 }

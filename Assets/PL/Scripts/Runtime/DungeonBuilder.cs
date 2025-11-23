@@ -41,12 +41,14 @@ public class DungeonBuilder : MonoBehaviour
 
     private List<GameObject> normalWalls = new List<GameObject>(); //to know all the walls i have
     private List<GameObject> torchWalls = new List<GameObject>(); //same with light walls
-    private bool hospitalWallsActive = false; //to make things appear and disappear
-    private bool hospitalTorchsActive = false; //same
 
     //NavMesh management
     public GameObject navMeshCube;
     private NavMeshSurface navMeshSurface;
+
+    // Store spawn positions for enemies and escape door until NavMesh is ready
+    private List<Vector3> enemySpawnPoints = new List<Vector3>();
+    private List<Vector3> escapeSpawnPoints = new List<Vector3>();
 
     void Start()
     {
@@ -55,6 +57,7 @@ public class DungeonBuilder : MonoBehaviour
         {
             Build(map); //spawns all the prefabs of walls, floors ect
         }
+
         if (navMeshCube != null)
         {
             Vector3 newSize = navMeshCube.transform.localScale;
@@ -68,11 +71,7 @@ public class DungeonBuilder : MonoBehaviour
             navMeshSurface = navMeshCube.GetComponent<NavMeshSurface>();
             if (navMeshSurface != null)
             {
-                navMeshSurface.BuildNavMesh();
-
-                MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>(); //so cube doesnt appear on top of the floor tiles
-                if (rend != null)
-                    rend.enabled = false;
+                StartCoroutine(BuildNavMeshAndSpawn());
             }
             else
             {
@@ -86,6 +85,24 @@ public class DungeonBuilder : MonoBehaviour
     {
         // removed UpdateMapWithSanity();
         // sanity-based prefabs are now chosen directly at generation time
+    }
+
+    IEnumerator BuildNavMeshAndSpawn()
+    {
+        // Build navmesh asynchronously, then spawn enemies
+        yield return null;
+        navMeshSurface.BuildNavMesh();
+
+        MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>(); //so cube doesnt appear on top of the floor tiles
+        if (rend != null)
+            rend.enabled = false;
+
+        // Spawn enemies and escape doors *after* NavMesh is built
+        foreach (Vector3 pos in enemySpawnPoints)
+            Instantiate(EnemyPrefab, pos, Quaternion.identity);
+
+        foreach (Vector3 pos in escapeSpawnPoints)
+            Instantiate(EscapePrefab, pos, Quaternion.identity);
     }
 
     void Build(int[,] map) //for each tile (number in the matrix map) we spawn the coresponding game object in the 3D map
@@ -157,9 +174,9 @@ public class DungeonBuilder : MonoBehaviour
                     if (t == 999)
                         playerSpawn = new Vector2Int(x, y); //we will teleport the player there, not instanciate it
                     else if (t == 88)
-                        Instantiate(EnemyPrefab, new Vector3(x, 0f, y), Quaternion.identity);
+                        enemySpawnPoints.Add(new Vector3(x, 0f, y)); // store enemy position for later
                     else if (t == 777)
-                        Instantiate(EscapePrefab, new Vector3(x, 0f, y), Quaternion.identity);
+                        escapeSpawnPoints.Add(new Vector3(x, 0f, y)); // store escape position for later
                 }
                 if (pf != null)
                 {
@@ -224,12 +241,21 @@ public class DungeonBuilder : MonoBehaviour
             Destroy(escapeDoor);
         }
 
+        enemySpawnPoints.Clear();
+        escapeSpawnPoints.Clear();
+
         StartCoroutine(RebuildNavMeshAfterCleanup());
     }
 
     private IEnumerator RebuildNavMeshAfterCleanup() //need to wait for navmesh obstacles from past map to disappear before making new navMesh surface
     {
-        yield return null;
+        // wait a few frames to clear navmesh job allocations
+        for (int i = 0; i < 5; i++)
+            yield return null;
+
+        NavMeshAgent[] agents = FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None);
+        foreach (var a in agents)
+            a.enabled = false;
 
         NavMesh.RemoveAllNavMeshData();
 
@@ -258,6 +284,13 @@ public class DungeonBuilder : MonoBehaviour
             yield return null;
 
             navMeshSurface.BuildNavMesh();
+
+            // spawn enemies and escape doors *after* the new NavMesh is built
+            foreach (Vector3 pos in enemySpawnPoints)
+                Instantiate(EnemyPrefab, pos, Quaternion.identity);
+
+            foreach (Vector3 pos in escapeSpawnPoints)
+                Instantiate(EscapePrefab, pos, Quaternion.identity);
 
             MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>();
             if (rend != null)

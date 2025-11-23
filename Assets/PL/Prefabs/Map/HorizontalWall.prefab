@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5363171311786918541}
   - component: {fileID: 5709148539574449451}
   - component: {fileID: 7896393428672929044}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HorizontalWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,6 +140,14 @@ PrefabInstance:
     - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_Name
       value: Floor Variant 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6761761746085810003, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7813690785318537795, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_LocalScale.x

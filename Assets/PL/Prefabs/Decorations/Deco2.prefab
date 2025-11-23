@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 216757086880979160}
   - component: {fileID: 8567194733284774543}
   - component: {fileID: 2054689752760414753}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 3503554014658300312}
   - component: {fileID: 5573885535179178365}
   - component: {fileID: 514227101804226918}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BoxSmall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 9169347542421784890}
   - component: {fileID: 567715072455426752}
   - component: {fileID: 4927110243114672646}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Deco2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,6 +262,14 @@ PrefabInstance:
     - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_Name
       value: Floor Variant 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6761761746085810003, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7813690785318537795, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_LocalScale.x

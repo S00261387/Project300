@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5716254975728571030}
   - component: {fileID: 3103644089729995799}
   - component: {fileID: 8871776697431442673}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6093717276841499095}
   - component: {fileID: 7905291439501081639}
   - component: {fileID: 9004127474020969107}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Deco4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,6 +173,14 @@ PrefabInstance:
     - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_Name
       value: Floor Variant 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6761761746085810003, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7813690785318537795, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_LocalScale.x
@@ -264,6 +272,18 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4631711835178256420, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4631711835486970573, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4631711835724472336, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7862689080800628208, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6683416
@@ -319,6 +339,10 @@ PrefabInstance:
     - target: {fileID: 7862689080800628211, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
       propertyPath: m_Name
       value: _Crates
+      objectReference: {fileID: 0}
+    - target: {fileID: 7862689080800628211, guid: c2c86cd01a78a0744bb37ca148391bc0, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
