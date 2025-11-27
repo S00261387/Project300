@@ -664,7 +664,7 @@ MonoBehaviour:
   minSplitSize: 5
   minRoomSize: 3
   Player: {fileID: 1288011367}
-  EnemyPrefab: {fileID: 2763679740569586293, guid: 1536a57cdf11ceb42a5416ec2cfef08c, type: 3}
+  EnemyPrefab: {fileID: 1367715384286308209, guid: aa17d37b65a283744bbff3d1d17235ef, type: 3}
   floorPrefab: {fileID: 775397689128903850, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
   wallPrefab: {fileID: 8795903824230058901, guid: f94b37a37bb44a445a539f489ddd5cc5, type: 3}
   wallTorch: {fileID: 4991790997309320783, guid: c4dae750859e6c84eb85f4c484b158d6, type: 3}
