@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.GraphicsBuffer;
 
 public class EnemyAi: MonoBehaviour
 {
     public NavMeshAgent agent;
 
     public Transform player;
+    public Transform playerHead;
 
     public LayerMask whatIsGround, whatIsPlayer;
 
@@ -67,6 +69,10 @@ public class EnemyAi: MonoBehaviour
     public bool Attacking = false;
     public bool Dead;
 
+
+    public Transform Eyes;
+    public bool PlayerHidden = true;
+
     //States
     [SerializeField] private bool Chase;
     [SerializeField] private bool Search;
@@ -90,6 +96,7 @@ public class EnemyAi: MonoBehaviour
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerHead = player.Find("Head").transform;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fov = GetComponent<FieldOfView>();
@@ -147,9 +154,37 @@ public class EnemyAi: MonoBehaviour
             //}
 
         }
+        RaycastHit hit;
+        float dstToTarget = Vector3.Distance(transform.position, player.transform.position);
+
+        if (dstToTarget <= fov.viewRadius)
+        {
+            if (Physics.Raycast(Eyes.position, (playerHead.transform.position - Eyes.position), out hit, Mathf.Infinity))
+
+            {
+
+                if (hit.transform == player.transform)
+
+                {
+
+                    PlayerHidden = false;
+
+                }
+
+                else
+
+                {
+
+                    PlayerHidden = true;
+
+                }
+
+            }
+        }
 
 
-        if (!Search && !Chase && !Distract)
+
+            if (!Search && !Chase && !Distract)
         {
             Patrol = true;
         }
@@ -158,7 +193,7 @@ public class EnemyAi: MonoBehaviour
             Patrol = false;
         }
 
-        if (fov.visible && !Chase)
+        if (fov.visible && !PlayerHidden && !Chase)
         {
             Patrol = false;
             Distract = false;
