@@ -6,11 +6,15 @@ public class EnemyAi: MonoBehaviour
 {
     public NavMeshAgent agent;
 
-    public Transform player;
-    public Transform playerHead;
+    //Player
+    GameObject Player;
+    PlayerHealth PlayerHealth;
+    PlayerInvisible PlayerVisibility;
+
 
     public LayerMask whatIsGround, whatIsPlayer;
 
+    //Distract
     public float DistractRadius;
     public float DistractCd;
    [SerializeField] private float DistractCdTimer = 0;
@@ -20,15 +24,11 @@ public class EnemyAi: MonoBehaviour
     public bool testHit;
 
 
+    //Pathing
 
     public Vector3[] walkPoints;
-
-    private Vector3 currentWalkPoint;
-
     public Vector3 nextWalkPoint;
-
     bool walkPointsSet = false;
-
     private int currentPoint = 0;
 
     //Patroling
@@ -42,8 +42,12 @@ public class EnemyAi: MonoBehaviour
     Vector3 Home;
     public float HomeRadius;
 
+    //Chasing
+
     public float chaseCd;
     private float chaseCdTimer;
+
+    //State Visualization
 
     [SerializeField] GameObject Question;
     [SerializeField] GameObject Exclamation;
@@ -69,10 +73,6 @@ public class EnemyAi: MonoBehaviour
     public bool Attacking = false;
     public bool Dead;
 
-
-    public Transform Eyes;
-    public bool PlayerHidden = true;
-
     //States
     [SerializeField] private bool Chase;
     [SerializeField] private bool Search;
@@ -95,8 +95,11 @@ public class EnemyAi: MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        playerHead = player.Find("Head").transform;
+       
+       Player = GameObject.FindGameObjectWithTag("Player");
+       PlayerHealth = Player.GetComponent<PlayerHealth>();
+       PlayerVisibility = Player.GetComponent<PlayerInvisible>();
+
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fov = GetComponent<FieldOfView>();
@@ -105,8 +108,6 @@ public class EnemyAi: MonoBehaviour
         Question.SetActive(false);
         Exclamation.SetActive(false);
         walkPoints = new Vector3[4];
-        //awareness = halfAwareness;
-
     }
 
     private void Update()
@@ -154,36 +155,6 @@ public class EnemyAi: MonoBehaviour
             //}
 
         }
-        RaycastHit hit;
-        float dstToTarget = Vector3.Distance(transform.position, player.transform.position);
-
-        if (dstToTarget <= fov.viewRadius)
-        {
-            if (Physics.Raycast(Eyes.position, (playerHead.transform.position - Eyes.position), out hit, Mathf.Infinity))
-
-            {
-
-                if (hit.transform == player.transform)
-
-                {
-
-                    PlayerHidden = false;
-
-                }
-
-                else
-
-                {
-
-                    PlayerHidden = true;
-
-                }
-
-            }
-        }
-
-
-
             if (!Search && !Chase && !Distract)
         {
             Patrol = true;
@@ -193,7 +164,7 @@ public class EnemyAi: MonoBehaviour
             Patrol = false;
         }
 
-        if (fov.visible && !PlayerHidden && !Chase)
+        if (fov.visible && !Chase && !PlayerVisibility.Invisible)
         {
             Patrol = false;
             Distract = false;
@@ -274,13 +245,12 @@ public class EnemyAi: MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Attacking = true;
-            GameObject Player = GameObject.FindGameObjectWithTag("Player");
-            PlayerHealth health = Player.GetComponent<PlayerHealth>();
-            if (health != null)
+       
+            if (PlayerHealth != null)
             {
-                if (!health.invincible)
+                if (!PlayerHealth.invincible)
                 {
-                    health.OnHit(attackDamage);
+                    PlayerHealth.OnHit(attackDamage);
                 }
             }
             else
@@ -304,12 +274,12 @@ public class EnemyAi: MonoBehaviour
             NotMoving = false;
             awareness = halfAwareness;          
             Question.SetActive(true);
-            transform.LookAt(player);
+            transform.LookAt(Player.transform);
             agent.isStopped = true;
             searchingStarted = true;
         }
        
-        if (fov.visible)
+        if (fov.visible && !PlayerVisibility.Invisible)
         {
             awareness -= Time.deltaTime;
         }
@@ -359,36 +329,6 @@ public class EnemyAi: MonoBehaviour
             PlayedChaseSound = false;
         }
 
-        //if (!walkPointSet)
-        //{
-        //    SearchWalkPoint();
-        //}
-
-        //if (walkPointSet)
-        //{
-        //    if (MoveCdTimer > 0)
-        //    {
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        MoveCdTimer = MoveCd;
-
-        //        agent.isStopped = false;
-
-        //        agent.SetDestination(walkPoint);
-
-        //        Vector3 distanceToWalkPoint = transform.position - walkPoint;
-
-        //        if (distanceToWalkPoint.magnitude < 2f)
-        //        {
-        //            walkPointSet = false;
-        //            agent.isStopped = true;
-        //        }
-        //    }
-        //}
-        //else { return; }
-
         if (!walkPointsSet)
         {
             walkPoints = SearchWalkPoint(walkPoints);
@@ -429,24 +369,6 @@ public class EnemyAi: MonoBehaviour
         }
     }
 
-    //private void SearchWalkPoint()
-    //{
-    //    do
-    //    {
-    //        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-    //        float randomX = Random.Range(-walkPointRange, walkPointRange);
-
-    //        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-    //        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(walkPoint, Home) <= HomeRadius && Vector3.Distance(transform.position, walkPoint) >= walkPointRange / 2)
-    //        {
-    //            walkPointSet = true;
-    //        }
-    //    }
-    //    while (!walkPointSet);
-
-
-    //}
 
     private Vector3[] SearchWalkPoint(Vector3[] WalkPoints)
     {
@@ -473,8 +395,13 @@ public class EnemyAi: MonoBehaviour
 
                     if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround) && Vector3.Distance(WalkPoints[i - 1], walkPoint) >= walkPointRange / 2 && Vector3.Distance(walkPoint, Home) <= HomeRadius)
                     {
-                        WalkPoints[i] = walkPoint;
+                        NavMeshHit hit;
+                        if (NavMesh.SamplePosition(walkPoint, out hit, 0f, NavMesh.AllAreas))
+                        {
+                           
+                            WalkPoints[i] = hit.position;
                         walkPointValid = true;
+                        }
                     }
                 
                 }
@@ -496,16 +423,16 @@ public class EnemyAi: MonoBehaviour
 
         chaseCdTimer -= Time.deltaTime;
 
-        agent.SetDestination(player.position);
+        agent.SetDestination(Player.transform.position);
 
 
-        if (!fov.visible && chaseCdTimer <= 0)
+        if (!fov.visible && chaseCdTimer <= 0 || fov.visible && chaseCdTimer <= 0 && PlayerVisibility.Invisible)
         {
             Chase = false;
             Search = true;
             Exclamation.SetActive(false);
         }
-        else if (fov.visible && chaseCdTimer <= 0)
+        else if (fov.visible && chaseCdTimer <= 0 && !PlayerVisibility.Invisible)
         {
             chaseCdTimer = chaseCd;
         }

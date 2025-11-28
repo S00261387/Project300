@@ -13,8 +13,6 @@ public struct ProjectileProperties
     public float drag;
 }
 
-[RequireComponent(typeof(TrajectoryPredictor))]
-
 public class PlayerThrow : MonoBehaviour
 {
     public TrajectoryPredictor trajectoryPredictor;
@@ -37,27 +35,27 @@ public class PlayerThrow : MonoBehaviour
 
     private void Update()
     {
-        Predict();
+        //Predict();
     }
 
-    void Predict()
-    {
-        trajectoryPredictor.PredictTrajectory(ProjectileData());
-    }
+    //void Predict()
+    //{
+    //    trajectoryPredictor.PredictTrajectory(ProjectileData());
+    //}
 
-    ProjectileProperties ProjectileData()
-    {
-        ProjectileProperties properties = new ProjectileProperties();
-        Rigidbody r = objectToThrow.GetComponent<Rigidbody>();
+    //ProjectileProperties ProjectileData()
+    //{
+    //    ProjectileProperties properties = new ProjectileProperties();
+    //    Rigidbody r = objectToThrow.GetComponent<Rigidbody>();
 
-        properties.direction = attackPoint.forward;
-        properties.initialPosition = attackPoint.position;
-        properties.initialSpeed = throwForce;
-        properties.mass = r.mass;
-        properties.drag = r.linearDamping;
+    //    properties.direction = attackPoint.forward;
+    //    properties.initialPosition = attackPoint.position;
+    //    properties.initialSpeed = throwForce;
+    //    properties.mass = r.mass;
+    //    properties.drag = r.linearDamping;
 
-        return properties;
-    }
+    //    return properties;
+    //}
 
     public void OnThrow(InputAction.CallbackContext obj)
     {

@@ -113,7 +113,7 @@ namespace PlayerRotate
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Crouch"",
+                    ""name"": ""Invisible"",
                     ""type"": ""Button"",
                     ""id"": ""d6d4b292-41c8-468f-9846-c1e5e40f90f1"",
                     ""expectedControlType"": """",
@@ -202,11 +202,11 @@ namespace PlayerRotate
                 {
                     ""name"": """",
                     ""id"": ""6796cb1b-7411-46ba-a037-808a3ba1fed4"",
-                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""path"": ""<Keyboard>/c"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Crouch"",
+                    ""action"": ""Invisible"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -217,7 +217,7 @@ namespace PlayerRotate
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Crouch"",
+                    ""action"": ""Invisible"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -495,7 +495,7 @@ namespace PlayerRotate
             m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
             m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
             m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
-            m_Game_Crouch = m_Game.FindAction("Crouch", throwIfNotFound: true);
+            m_Game_Invisible = m_Game.FindAction("Invisible", throwIfNotFound: true);
             m_Game_Sprint = m_Game.FindAction("Sprint", throwIfNotFound: true);
             m_Game_Interact = m_Game.FindAction("Interact", throwIfNotFound: true);
             m_Game_Attack = m_Game.FindAction("Attack", throwIfNotFound: true);
@@ -592,7 +592,7 @@ namespace PlayerRotate
         private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
         private readonly InputAction m_Game_Move;
         private readonly InputAction m_Game_Jump;
-        private readonly InputAction m_Game_Crouch;
+        private readonly InputAction m_Game_Invisible;
         private readonly InputAction m_Game_Sprint;
         private readonly InputAction m_Game_Interact;
         private readonly InputAction m_Game_Attack;
@@ -619,9 +619,9 @@ namespace PlayerRotate
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Game_Jump;
             /// <summary>
-            /// Provides access to the underlying input action "Game/Crouch".
+            /// Provides access to the underlying input action "Game/Invisible".
             /// </summary>
-            public InputAction @Crouch => m_Wrapper.m_Game_Crouch;
+            public InputAction @Invisible => m_Wrapper.m_Game_Invisible;
             /// <summary>
             /// Provides access to the underlying input action "Game/Sprint".
             /// </summary>
@@ -678,9 +678,9 @@ namespace PlayerRotate
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
-                @Crouch.started += instance.OnCrouch;
-                @Crouch.performed += instance.OnCrouch;
-                @Crouch.canceled += instance.OnCrouch;
+                @Invisible.started += instance.OnInvisible;
+                @Invisible.performed += instance.OnInvisible;
+                @Invisible.canceled += instance.OnInvisible;
                 @Sprint.started += instance.OnSprint;
                 @Sprint.performed += instance.OnSprint;
                 @Sprint.canceled += instance.OnSprint;
@@ -716,9 +716,9 @@ namespace PlayerRotate
                 @Jump.started -= instance.OnJump;
                 @Jump.performed -= instance.OnJump;
                 @Jump.canceled -= instance.OnJump;
-                @Crouch.started -= instance.OnCrouch;
-                @Crouch.performed -= instance.OnCrouch;
-                @Crouch.canceled -= instance.OnCrouch;
+                @Invisible.started -= instance.OnInvisible;
+                @Invisible.performed -= instance.OnInvisible;
+                @Invisible.canceled -= instance.OnInvisible;
                 @Sprint.started -= instance.OnSprint;
                 @Sprint.performed -= instance.OnSprint;
                 @Sprint.canceled -= instance.OnSprint;
@@ -984,12 +984,12 @@ namespace PlayerRotate
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnJump(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Crouch" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Invisible" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnCrouch(InputAction.CallbackContext context);
+            void OnInvisible(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

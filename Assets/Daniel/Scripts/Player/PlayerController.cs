@@ -6,11 +6,13 @@ using UnityEngine.InputSystem;
 //[RequireComponent(typeof(PlayerInteraction))]
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerThrow))]
+[RequireComponent(typeof(PlayerInvisible))]
 public class PlayerController : MonoBehaviour
 {
    private PlayerInput playerInput;
     private PlayerMovement playerMovement; 
     private PlayerThrow playerThrow;
+    private PlayerInvisible playerInvisible;
    // private PlayerCamera playerCamera;
    //private PlayerInteraction playerInteraction;
     //private PlayerAttack playerAttack;
@@ -20,6 +22,7 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         playerMovement = GetComponent<PlayerMovement>();
         playerThrow = GetComponent<PlayerThrow>();
+        playerInvisible = GetComponent<PlayerInvisible>();
       //  playerCamera = GetComponent<PlayerCamera>();
         //playerInteraction = GetComponent<PlayerInteraction>();
 
@@ -44,7 +47,7 @@ public class PlayerController : MonoBehaviour
         playerInput.actions["Move"].performed += playerMovement.OnMove;
         playerInput.actions["Move"].canceled += playerMovement.OnMove;
         playerInput.actions["Jump"].performed += playerMovement.OnJump;
-        playerInput.actions["Crouch"].performed += playerMovement.OnCrouch;
+        playerInput.actions["Invisible"].performed += playerInvisible.OnInvisible;
         //playerInput.actions["Sprint"].performed += playerMovement.OnSprint;
         playerInput.actions["Dash"].performed += playerMovement.OnDash;
         playerInput.actions["Throw"].performed += playerThrow.OnThrow;
@@ -60,7 +63,7 @@ public class PlayerController : MonoBehaviour
         playerInput.actions["Move"].performed -= playerMovement.OnMove;
         playerInput.actions["Move"].canceled -= playerMovement.OnMove;
         playerInput.actions["Jump"].performed -= playerMovement.OnJump;
-        playerInput.actions["Crouch"].performed -= playerMovement.OnCrouch;
+        playerInput.actions["Invisible"].performed -= playerInvisible.OnInvisible;
         //playerInput.actions["Sprint"].performed -= playerMovement.OnSprint;
         playerInput.actions["Dash"].performed -= playerMovement.OnDash;
         playerInput.actions["Throw"].performed -= playerThrow.OnThrow;

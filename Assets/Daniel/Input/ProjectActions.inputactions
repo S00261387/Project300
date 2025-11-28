@@ -25,7 +25,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Crouch",
+                    "name": "Invisible",
                     "type": "Button",
                     "id": "d6d4b292-41c8-468f-9846-c1e5e40f90f1",
                     "expectedControlType": "",
@@ -114,11 +114,11 @@
                 {
                     "name": "",
                     "id": "6796cb1b-7411-46ba-a037-808a3ba1fed4",
-                    "path": "<Keyboard>/leftCtrl",
+                    "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Crouch",
+                    "action": "Invisible",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -129,7 +129,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Crouch",
+                    "action": "Invisible",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
