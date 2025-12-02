@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class EnemyAi : MonoBehaviour
 {
@@ -26,9 +27,11 @@ public class EnemyAi : MonoBehaviour
     private bool hasPlayedSurprise = false;
 
     private Vector3 lastKnownPosition;
-    private Vector3 patrolTarget;
 
     public float patrolRadius = 10f;
+
+    public List<Vector3> patrolPoints;
+    private int patrolIndex = 0;
 
     void Start()
     {
@@ -49,7 +52,14 @@ public class EnemyAi : MonoBehaviour
                 Debug.LogWarning("EnemyAi: No Player found in scene! Make sure your Player has the 'Player' tag.");
         }
 
-        PickNewPatrolPoint();
+        if (patrolPoints != null && patrolPoints.Count > 0)
+        {
+            GoToNextPatrolPoint();
+        }
+        else
+        {
+            PickNewPatrolPoint();
+        }
     }
 
     void Update()
@@ -86,6 +96,7 @@ public class EnemyAi : MonoBehaviour
             }
             else if (isChasing)
             {
+                agent.isStopped = false;
                 agent.SetDestination(player.position);
             }
         }
@@ -96,6 +107,7 @@ public class EnemyAi : MonoBehaviour
                 // Go to last known position
                 if (Vector3.Distance(transform.position, lastKnownPosition) > 0.5f)
                 {
+                    agent.isStopped = false;
                     agent.SetDestination(lastKnownPosition);
                 }
                 else
@@ -116,14 +128,27 @@ public class EnemyAi : MonoBehaviour
                 if (lookAroundTimer <= 0f)
                 {
                     isLookingAround = false;
-                    PickNewPatrolPoint();
+                    agent.isStopped = false;
+                    agent.speed = walkSpeed;
+                    anim.SetBool("isWalking", true);
+                    anim.SetBool("isRunning", false);
+                    anim.ResetTrigger("LookAround");
+                    GoToNextPatrolPoint();
                 }
             }
-            else if (!isSuspicious)
+            else if (isSuspicious)
+            {
+                // lost the player during suspicion phase: drop suspicion and resume patrol
+                isSuspicious = false;
+                suspicionTimer = 0f;
+                agent.isStopped = false;
+                GoToNextPatrolPoint();
+            }
+            else
             {
                 // normal patrol
                 if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                    PickNewPatrolPoint();
+                    GoToNextPatrolPoint();
             }
         }
 
@@ -147,6 +172,45 @@ public class EnemyAi : MonoBehaviour
         anim.SetBool("isRunning", true);
     }
 
+    public void InitializePatrol(List<Vector3> points)
+    {
+        patrolPoints = points;
+        patrolIndex = 0;
+    }
+
+    void GoToNextPatrolPoint()
+    {
+        if (patrolPoints == null || patrolPoints.Count == 0)
+        {
+            PickNewPatrolPoint();
+            return;
+        }
+
+        patrolIndex = (patrolIndex + 1) % patrolPoints.Count;
+        Vector3 nextPoint = patrolPoints[patrolIndex];
+
+        NavMeshPath path = new NavMeshPath();
+        if (agent.CalculatePath(nextPoint, path) && path.status == NavMeshPathStatus.PathComplete)
+        {
+            agent.isStopped = false;
+            agent.speed = walkSpeed;
+            agent.SetDestination(nextPoint);
+            anim.SetBool("isWalking", true);
+            anim.SetBool("isRunning", false);
+        }
+        else
+        {
+            PickNewPatrolPoint();
+        }
+
+        // reset state
+        isSuspicious = false;
+        suspicionTimer = 0f;
+        isChasing = false;
+        isLookingAround = false;
+        hasPlayedSurprise = false;
+    }
+
     void PickNewPatrolPoint()
     {
         Vector3 randomDir = Random.insideUnitSphere * patrolRadius;
@@ -154,14 +218,17 @@ public class EnemyAi : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomDir, out hit, patrolRadius, NavMesh.AllAreas))
         {
-            patrolTarget = hit.position;
-            agent.isStopped = false;
-            agent.speed = walkSpeed;
-            agent.SetDestination(patrolTarget);
-            anim.SetBool("isWalking", true);
-            anim.SetBool("isRunning", false);
-            anim.ResetTrigger("LookAround");
-            anim.ResetTrigger("Surprise");
+            NavMeshPath path = new NavMeshPath();
+            if (agent.CalculatePath(hit.position, path) && path.status == NavMeshPathStatus.PathComplete)
+            {
+                agent.isStopped = false;
+                agent.speed = walkSpeed;
+                agent.SetDestination(hit.position);
+                anim.SetBool("isWalking", true);
+                anim.SetBool("isRunning", false);
+                anim.ResetTrigger("LookAround");
+                anim.ResetTrigger("Surprise");
+            }
         }
 
         // reset state
