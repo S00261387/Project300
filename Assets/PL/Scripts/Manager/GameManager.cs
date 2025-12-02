@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 #pragma warning disable UDR0001
 
 public class GameManager : MonoBehaviour
@@ -6,7 +8,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public int currentLevel = 1;
-    public DungeonBuilder builder;
+
+    private DungeonBuilder builder;
 
     void Awake()
     {
@@ -18,21 +21,27 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        builder = Object.FindFirstObjectByType<DungeonBuilder>();
     }
 
     public void NextLevel()
     {
         currentLevel++;
-        Debug.Log($"Generating Level {currentLevel}");
+        Debug.Log($"Accessing Floor {currentLevel}");
 
-        if (builder != null)
-        {
-            builder.GenerateNewMap();
-        }
-        else
-        {
-            Debug.LogWarning("builder is null");
-        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

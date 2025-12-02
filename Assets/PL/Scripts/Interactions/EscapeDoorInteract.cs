@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EscapeDoorInteract : MonoBehaviour
 {
@@ -7,7 +8,9 @@ public class EscapeDoorInteract : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Player escapes current level");
-            GameManager.Instance.NextLevel();
+            GameManager.Instance.currentLevel++;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

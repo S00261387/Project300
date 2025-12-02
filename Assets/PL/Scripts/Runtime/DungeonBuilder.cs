@@ -52,6 +52,9 @@ public class DungeonBuilder : MonoBehaviour
 
     void Start()
     {
+        if (Player == null)
+            Player = GameObject.FindWithTag("Player");
+
         int[,] map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomSize); //generate the matrix map
         if (map != null)
         {
