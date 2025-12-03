@@ -57,26 +57,63 @@ public class CustomPlayerController : MonoBehaviour
         {
             isFirstPerson = !isFirstPerson;
 
-            if (isFirstPerson)
-            {
-                playerCamera.transform.SetParent(firstPersonCameraPos);
-                playerCamera.transform.localPosition = Vector3.zero;
-                playerCamera.transform.localRotation = Quaternion.identity;
-                Cursor.lockState = CursorLockMode.Locked;
+            StopAllCoroutines();
+            StartCoroutine(SmoothCameraTransition());
+        }
+    }
 
-                foreach (var r in playerRenderers)
-                    r.enabled = false;
-            }
-            else
-            {
-                playerCamera.transform.SetParent(null);
-                playerCamera.transform.position = transform.position + Vector3.up * 10f;
-                playerCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                Cursor.lockState = CursorLockMode.None;
+    System.Collections.IEnumerator SmoothCameraTransition()
+    {
+        float duration = 0.6f;
+        float time = 0f;
 
-                foreach (var r in playerRenderers)
-                    r.enabled = true;
-            }
+        Vector3 startPos = playerCamera.transform.position;
+        Quaternion startRot = playerCamera.transform.rotation;
+
+        Vector3 targetPos;
+        Quaternion targetRot;
+
+        if (isFirstPerson)
+        {
+            targetPos = firstPersonCameraPos.position;
+            targetRot = firstPersonCameraPos.rotation;
+
+            foreach (var r in playerRenderers)
+                r.enabled = false;
+        }
+        else
+        {
+            targetPos = transform.position + Vector3.up * 10f;
+            targetRot = Quaternion.Euler(90f, 0f, 0f);
+
+            foreach (var r in playerRenderers)
+                r.enabled = true;
+        }
+        
+        while (time < duration)
+        {
+            float t = time / duration;
+            t = Mathf.SmoothStep(0f, 1f, t);
+
+            playerCamera.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            playerCamera.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCamera.transform.position = targetPos;
+        playerCamera.transform.rotation = targetRot;
+
+        if (isFirstPerson)
+        {
+            playerCamera.transform.SetParent(firstPersonCameraPos);
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            playerCamera.transform.SetParent(null);
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 
