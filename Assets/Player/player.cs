@@ -26,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (BrainHUDToggle.IsBrainOpen)
+            return;
         Vector3 moveDirection = Vector3.zero;
 
         if (Input.GetKey(KeyCode.W)) moveDirection += Vector3.forward;
