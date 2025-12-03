@@ -6,6 +6,8 @@ public class SanityManager : MonoBehaviour
 {
     public static SanityManager Instance { get; private set; }
 
+    public SanityBar sanityBar;
+
     [Header("Sanity Settings")]
     public float sanity = 10f;          // current sanity
     public float maxSanity = 10f;       // max sanity cap (increases over time)
@@ -48,6 +50,7 @@ public class SanityManager : MonoBehaviour
     {
         UpdateSanity();
         UpdateVisualEffects();
+        sanityBar.SetSanity(sanity);
     }
 
     void UpdateSanity()
