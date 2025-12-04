@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class Brainzone : MonoBehaviour
 {
-    public Image zoneImage; // какой Image красим
+    public Image zoneImage; 
     public Color filledColor = Color.red;
     public Color defaultColor = Color.white;
     bool isFilled = false;

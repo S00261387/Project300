@@ -5,8 +5,8 @@ public class PlayerHealth : MonoBehaviour
 {
     public float maxHealth = 100f;
 
-    [Header("HUD здоровья")]
-    public Image healthMask; // чёрная полоска поверх красной
+    [Header("HUD health")]
+    public Image healthMask; 
 
     [HideInInspector] public float currentHealth;
 
@@ -23,7 +23,7 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth < 0f)
             currentHealth = 0f;
 
-        UpdateHealthUI(); // ВАЖНО: обновляем полосу каждый раз, когда хп меняется
+        UpdateHealthUI(); 
     }
 
     void UpdateHealthUI()
