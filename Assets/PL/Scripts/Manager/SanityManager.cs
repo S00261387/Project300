@@ -50,7 +50,7 @@ public class SanityManager : MonoBehaviour
     {
         UpdateSanity();
         UpdateVisualEffects();
-        sanityBar.SetSanity(sanity);
+        sanityBar.SetSanity(sanity / 100f);
     }
 
     void UpdateSanity()

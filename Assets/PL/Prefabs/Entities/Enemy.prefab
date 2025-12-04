@@ -279,7 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldOfView
   viewRadius: 10
-  viewAngle: 90
+  viewAngle: 100
   targetMask:
     serializedVersion: 2
     m_Bits: 8
@@ -313,6 +313,7 @@ MonoBehaviour:
   surpriseDuration: 1.2
   lookAroundTime: 3
   patrolRadius: 10
+  patrolPoints: []
 --- !u!4 &3247447966455713999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 94f668c8d48d3814a93307283aba549b, type: 3}
