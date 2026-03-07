@@ -52,7 +52,8 @@ public class DungeonBuilder : MonoBehaviour
         if (Player == null)
             Player = GameObject.FindWithTag("Player");
 
-        map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomSize);
+        map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv,
+            maxRooms, minSplitSize, minRoomSize);
         if (map != null)
         {
             Build(map);
@@ -79,6 +80,7 @@ public class DungeonBuilder : MonoBehaviour
             }
         }
         PlacePlayer(playerSpawn);
+        NotifyFogManager();
     }
 
     void Update() { }
@@ -117,6 +119,9 @@ public class DungeonBuilder : MonoBehaviour
             isHospitalTheme = SanityManager.Instance.sanity > 50f;
         }
 
+        normalWalls.Clear();
+        torchWalls.Clear();
+
         int h = map.GetLength(0);
         int w = map.GetLength(1);
         int y = 0;
@@ -154,7 +159,8 @@ public class DungeonBuilder : MonoBehaviour
                 else if (t == 7)
                 {
                     if (decorationPrefabs != null && decorationPrefabs.Count > 0)
-                        pf = decorationPrefabs[Random.Range(0, decorationPrefabs.Count)];
+                        pf = decorationPrefabs[Random.Range(0,
+                            decorationPrefabs.Count)];
                 }
                 else if (t == 8) pf = libraryPrefab;
                 else if (t == 999 || t == 88 || t == 777)
@@ -169,7 +175,8 @@ public class DungeonBuilder : MonoBehaviour
                 }
                 if (pf != null)
                 {
-                    GameObject obj = Instantiate(pf, new Vector3(x, 0f, y), rot, transform);
+                    GameObject obj = Instantiate(pf, new Vector3(x, 0f, y),
+                        rot, transform);
                     if (pf == wallPrefab || pf == wallHospital)
                         normalWalls.Add(obj);
                     else if (pf == wallTorch || pf == wallTorchHospital)
@@ -207,7 +214,8 @@ public class DungeonBuilder : MonoBehaviour
             Destroy(enemy);
         }
 
-        GameObject[] oldEscapeDoor = GameObject.FindGameObjectsWithTag("EscapeDoor");
+        GameObject[] oldEscapeDoor = GameObject.FindGameObjectsWithTag(
+            "EscapeDoor");
         foreach (GameObject escapeDoor in oldEscapeDoor)
         {
             Destroy(escapeDoor);
@@ -224,13 +232,15 @@ public class DungeonBuilder : MonoBehaviour
         for (int i = 0; i < 5; i++)
             yield return null;
 
-        NavMeshAgent[] agents = FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None);
+        NavMeshAgent[] agents = FindObjectsByType<NavMeshAgent>(
+            FindObjectsSortMode.None);
         foreach (var a in agents)
             a.enabled = false;
 
         NavMesh.RemoveAllNavMeshData();
 
-        map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv, maxRooms, minSplitSize, minRoomSize);
+        map = DungeonGenerator.GenerateMatrix(width, height, seed, probaDiv,
+            maxRooms, minSplitSize, minRoomSize);
         Build(map);
         PlacePlayer(playerSpawn);
 
@@ -238,7 +248,8 @@ public class DungeonBuilder : MonoBehaviour
         {
             Vector3 newScale = new Vector3(width, 1f, height);
             navMeshCube.transform.localScale = newScale;
-            navMeshCube.transform.position = new Vector3(width / 2f - 0.5f, 0f, height / 2f - 0.5f);
+            navMeshCube.transform.position = new Vector3(width / 2f - 0.5f, 0f,
+                height / 2f - 0.5f);
 
             BoxCollider col = navMeshCube.GetComponent<BoxCollider>();
             if (col == null)
@@ -256,6 +267,9 @@ public class DungeonBuilder : MonoBehaviour
 
             navMeshSurface.BuildNavMesh();
 
+
+            //removed to test with just a cube prefab
+            /*
             foreach (Vector3 pos in enemySpawnPoints)
             {
                 GameObject e = Instantiate(EnemyPrefab, pos, Quaternion.identity);
@@ -268,6 +282,7 @@ public class DungeonBuilder : MonoBehaviour
                     ai.InitializePatrol(patrol);
                 }
             }
+            */
 
             foreach (Vector3 pos in escapeSpawnPoints)
                 Instantiate(EscapePrefab, pos, Quaternion.identity);
@@ -280,6 +295,8 @@ public class DungeonBuilder : MonoBehaviour
         {
             Debug.LogWarning("navMesh is null");
         }
+
+        NotifyFogManager();
     }
 
     List<Vector2Int> GetRoomTiles(Vector2Int start)
@@ -295,7 +312,8 @@ public class DungeonBuilder : MonoBehaviour
             r.Add(t);
             Vector2Int[] d = new Vector2Int[]
             {
-                Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down
+                Vector2Int.right, Vector2Int.left, Vector2Int.up,
+                Vector2Int.down
             };
             for (int i = 0; i < d.Length; i++)
             {
@@ -303,7 +321,8 @@ public class DungeonBuilder : MonoBehaviour
                 if (n.x >= 0 && n.x < width && n.y >= 0 && n.y < height)
                 {
                     int tile = map[n.y, n.x];
-                    if (!v.Contains(n) && (tile == 1 || tile == 7 || tile == 8 || tile == 999))
+                    if (!v.Contains(n) && (tile == 1 || tile == 7 ||
+                        tile == 8 || tile == 999))
                     {
                         v.Add(n);
                         q.Enqueue(n);
@@ -324,5 +343,27 @@ public class DungeonBuilder : MonoBehaviour
             pts.Add(new Vector3(t.x + 0.5f, 0f, t.y + 0.5f));
         }
         return pts;
+    }
+
+    void NotifyFogManager()
+    {
+        FogOfWarManager fog = FindFirstObjectByType<FogOfWarManager>();
+        if (fog != null)
+            fog.RebuildStaticMask();
+    }
+
+    public List<GameObject> GetTorchWalls()
+    {
+        return torchWalls;
+    }
+
+    public Vector2 GetMapSize()
+    {
+        return new Vector2(width, height);
+    }
+
+    public Vector3 GetMapOrigin()
+    {
+        return Vector3.zero;
     }
 }
