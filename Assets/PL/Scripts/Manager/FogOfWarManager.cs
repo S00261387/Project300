@@ -6,6 +6,7 @@ public class FogOfWarManager : MonoBehaviour
     [Header("References")]
     public DungeonBuilder dungeonBuilder;
     public Transform player;
+    public Transform lookSource;
     public Renderer fogRenderer;
 
     [Header("Texture Size")]
@@ -19,7 +20,6 @@ public class FogOfWarManager : MonoBehaviour
     public float playerRadius = 2.5f;
     public float flashlightRange = 7f;
     [Range(1f, 179f)] public float flashlightAngle = 70f;
-    public Vector3 lookDirection = Vector3.forward;
 
     [Header("Fog")]
     [Range(0f, 1f)] public float fogAlpha = 0.9f;
@@ -36,18 +36,7 @@ public class FogOfWarManager : MonoBehaviour
 
     void Start()
     {
-        if (dungeonBuilder == null)
-            dungeonBuilder = FindFirstObjectByType<DungeonBuilder>();
-
-        if (player == null)
-        {
-            GameObject p = GameObject.FindWithTag("Player");
-            if (p != null)
-                player = p.transform;
-        }
-
-        if (fogRenderer == null)
-            fogRenderer = GetComponent<Renderer>();
+        RefreshReferences();
 
         if (dungeonBuilder == null || player == null || fogRenderer == null)
         {
@@ -65,13 +54,59 @@ public class FogOfWarManager : MonoBehaviour
         SetupFogObject();
         ApplyMaterialData();
         RebuildStaticMask();
+        UpdatePlayerMask();
+        ApplyMaterialData();
     }
 
     void LateUpdate()
     {
+        if (!enabled)
+            return;
+
+        if (player == null)
+            RefreshReferences();
+
         if (player == null || fogMaterial == null)
             return;
 
+        UpdatePlayerMask();
+        ApplyMaterialData();
+    }
+
+    void RefreshReferences()
+    {
+        if (dungeonBuilder == null)
+            dungeonBuilder = FindFirstObjectByType<DungeonBuilder>();
+
+        if (player == null)
+        {
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p != null)
+                player = p.transform;
+        }
+
+        if (fogRenderer == null)
+            fogRenderer = GetComponent<Renderer>();
+    }
+
+    public void RefreshAllMasks()
+    {
+        RefreshReferences();
+
+        if (dungeonBuilder == null || player == null || fogRenderer == null)
+            return;
+
+        if (fogMaterial == null)
+            fogMaterial = fogRenderer.material;
+
+        mapOrigin = dungeonBuilder.GetMapOrigin();
+        mapSize = dungeonBuilder.GetMapSize();
+
+        if (torchMask == null || playerMask == null)
+            CreateTextures();
+
+        SetupFogObject();
+        RebuildStaticMask();
         UpdatePlayerMask();
         ApplyMaterialData();
     }
@@ -90,6 +125,7 @@ public class FogOfWarManager : MonoBehaviour
         ClearPixels(torchPixels);
 
         List<GameObject> torches = dungeonBuilder.GetTorchWalls();
+
         for (int i = 0; i < torches.Count; i++)
         {
             if (torches[i] == null)
@@ -134,16 +170,24 @@ public class FogOfWarManager : MonoBehaviour
 
     void SetupFogObject()
     {
-        Transform t = fogRenderer.transform;
-        t.position = new Vector3(mapOrigin.x + mapSize.x * 0.5f, overlayY,
-            mapOrigin.z + mapSize.y * 0.5f);
-        t.rotation = Quaternion.Euler(90f, 0f, 0f);
+        if (fogRenderer == null)
+            return;
 
+        Transform t = fogRenderer.transform;
+
+        t.position = new Vector3(mapOrigin.x + mapSize.x * 0.5f,
+            overlayY,
+            mapOrigin.z + mapSize.y * 0.5f);
+
+        t.rotation = Quaternion.Euler(90f, 0f, 0f);
         t.localScale = new Vector3(mapSize.x, mapSize.y, 1f);
     }
 
     void ApplyMaterialData()
     {
+        if (fogMaterial == null)
+            return;
+
         fogMaterial.SetTexture("_TorchMask", torchMask);
         fogMaterial.SetTexture("_PlayerMask", playerMask);
         fogMaterial.SetVector("_MapOrigin",
@@ -155,10 +199,12 @@ public class FogOfWarManager : MonoBehaviour
 
     void UpdatePlayerMask()
     {
+        if (playerMask == null || playerPixels == null || player == null)
+            return;
+
         ClearPixels(playerPixels);
 
         Vector3 p = player.position;
-
         DrawCircle(playerPixels, p, playerRadius);
         DrawCone(playerPixels, p, GetForwardOnXZ(), flashlightRange,
             flashlightAngle);
@@ -169,14 +215,14 @@ public class FogOfWarManager : MonoBehaviour
 
     Vector3 GetForwardOnXZ()
     {
-        Vector3 dir = lookDirection;
+        Transform source = lookSource != null ? lookSource : player;
 
-        if (player != null)
-        {
-            dir = player.forward;
-        }
+        if (source == null)
+            return Vector3.forward;
 
+        Vector3 dir = source.forward;
         dir.y = 0f;
+
         if (dir.sqrMagnitude < 0.0001f)
             dir = Vector3.forward;
 
@@ -203,9 +249,12 @@ public class FogOfWarManager : MonoBehaviour
             {
                 Vector3 wp = PixelToWorld(x, y);
                 Vector2 d = new Vector2(wp.x - worldPos.x, wp.z - worldPos.z);
+
                 if (d.sqrMagnitude <= r2)
+                {
                     pixels[y * textureWidth + x] = new Color32(255, 255, 255,
                         255);
+                }
             }
         }
     }
@@ -225,7 +274,6 @@ public class FogOfWarManager : MonoBehaviour
 
         float cosHalf = Mathf.Cos(angleDeg * 0.5f * Mathf.Deg2Rad);
         float r2 = rangeWorld * rangeWorld;
-
         Vector2 fwd = new Vector2(forward.x, forward.z).normalized;
 
         for (int y = minY; y <= maxY; y++)
@@ -235,14 +283,24 @@ public class FogOfWarManager : MonoBehaviour
                 Vector3 wp = PixelToWorld(x, y);
                 Vector2 dir = new Vector2(wp.x - worldPos.x, wp.z - worldPos.z);
                 float dist2 = dir.sqrMagnitude;
-                if (dist2 > r2 || dist2 < 0.0001f)
+
+                if (dist2 > r2)
                     continue;
 
-                dir.Normalize();
-                float dot = Vector2.Dot(fwd, dir);
-                if (dot >= cosHalf)
+                if (dist2 < 0.0001f)
+                {
                     pixels[y * textureWidth + x] = new Color32(255, 255, 255,
                         255);
+                    continue;
+                }
+
+                dir.Normalize();
+
+                if (Vector2.Dot(fwd, dir) >= cosHalf)
+                {
+                    pixels[y * textureWidth + x] = new Color32(255, 255, 255,
+                        255);
+                }
             }
         }
     }
@@ -274,6 +332,7 @@ public class FogOfWarManager : MonoBehaviour
     void ClearPixels(Color32[] pixels)
     {
         Color32 c = new Color32(0, 0, 0, 255);
+
         for (int i = 0; i < pixels.Length; i++)
             pixels[i] = c;
     }
