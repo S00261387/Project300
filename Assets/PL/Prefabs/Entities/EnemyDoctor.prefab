@@ -145,6 +145,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyDoctor
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 145dbb65e62d20842bc47fd856917411, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 2852337676281066862, guid: 145dbb65e62d20842bc47fd856917411, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -190,6 +194,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 145dbb65e62d20842bc47fd856917411, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3648626996331845895}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 145dbb65e62d20842bc47fd856917411, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1033007300055296533}
   m_SourcePrefab: {fileID: 100100000, guid: 145dbb65e62d20842bc47fd856917411, type: 3}
 --- !u!1 &1367715384286308209 stripped
 GameObject:
@@ -338,6 +345,19 @@ MonoBehaviour:
   lookAroundTime: 3
   patrolRadius: 10
   patrolPoints: []
+--- !u!114 &1033007300055296533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367715384286308209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7100656dcef0f324e9bfce8e2d4670b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyTouchTeleport
+  hitCooldown: 1
 --- !u!4 &1851200765851909579 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 145dbb65e62d20842bc47fd856917411, type: 3}

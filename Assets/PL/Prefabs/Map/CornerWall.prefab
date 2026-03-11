@@ -111,8 +111,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6, y: 2.6999998, z: 0.6}
-  m_Center: {x: 0, y: 1.3499999, z: 0}
+  m_Size: {x: 0.6, y: 2.7543101, z: 0.6}
+  m_Center: {x: 0, y: 1.3228447, z: 0}
 --- !u!208 &1323049443033865998
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -120,7 +120,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 167965696143711469}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 0.075, y: 1.35, z: 0.075}
@@ -195,6 +195,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7813690785318537795, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8981304733713645069, guid: 18a057063d90724458d4f2e22cea77a4, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

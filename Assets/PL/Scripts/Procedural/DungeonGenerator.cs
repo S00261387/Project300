@@ -16,7 +16,7 @@ public static class DungeonGenerator
     static int row;
 
     public static int[,] GenerateMatrix(int width, int height, int seed, int probaDiv, int maxRooms, int minSplitSize, int minRoomSize)
-        /*uses all our functions to create a matrix of int with rooms and corridors and specific numbers for floors, walls, doors ect*/
+    /*uses all our functions to create a matrix of int with rooms and corridors and specific numbers for floors, walls, doors ect*/
     {
         col = width;
         row = height;
@@ -42,7 +42,7 @@ public static class DungeonGenerator
         PlaceWalls(map); //not very opti to do three "place" functions, if i have time ill merge into one to only parcour the matrix once
         PlaceDoors(map); //before i forget, some stuff has to be done before other, doors need to be created before decorations so idk if possible to merge the functions
         PlaceDecorations(map);
-        PlaceEntities(map, nodes, 10); //number of ennemy we want
+        PlaceEntities(map, nodes); //number of ennemy we want
 
         return map;
     }
@@ -110,7 +110,7 @@ public static class DungeonGenerator
     }
 
     static List<Node> GenerateNodes(Queue<Room> rooms)
-        /*generates the list of nodes from the queue rooms (with ajacent rooms) so we can use it in our graph algorithme*/
+    /*generates the list of nodes from the queue rooms (with ajacent rooms) so we can use it in our graph algorithme*/
     {
         List<Node> list = new List<Node>();
         while (rooms.Count > 0) list.Add(new Node(rooms.Dequeue()));
@@ -201,7 +201,7 @@ public static class DungeonGenerator
     }
 
     static void DrawRooms(int[,] map, List<Node> nodes)
-        /*just lace floors inside the room dimensions*/
+    /*just lace floors inside the room dimensions*/
     {
         int k = 0;
         while (k < nodes.Count)
@@ -229,7 +229,7 @@ public static class DungeonGenerator
     }
 
     static void DrawCorridor(Room r1, Room r2, int[,] map)
-        /*places floor tiles to link the two rooms centers*/
+    /*places floor tiles to link the two rooms centers*/
     {
         int x1 = r1.xPos + r1.xSize / 2;
         int y1 = r1.yPos + r1.ySize / 2;
@@ -288,10 +288,10 @@ public static class DungeonGenerator
     }
 
     static void GenerateCorridors(List<Node> nodes, int[,] map)
-        /*Take first node, trace a corridor from its center to the height or depth of the 1 or 2 randmly selected room 
-         * from the adjacent rooms and then to the depth or height of the center of those rooms and check those rooms 
-         * as connected to the main network, then put those rooms in a queue, we do the same for each rooms 
-         * of the queue until queue is empty, we then check all the rooms to see if they are connected to the main network, if not we connect them to a room that is connected.*/
+    /*Take first node, trace a corridor from its center to the height or depth of the 1 or 2 randmly selected room 
+     * from the adjacent rooms and then to the depth or height of the center of those rooms and check those rooms 
+     * as connected to the main network, then put those rooms in a queue, we do the same for each rooms 
+     * of the queue until queue is empty, we then check all the rooms to see if they are connected to the main network, if not we connect them to a room that is connected.*/
     {
         if (nodes.Count == 0) return;
 
@@ -424,9 +424,9 @@ public static class DungeonGenerator
         }
     }
 
-    static void PlaceDoors(int[,] map) 
-        /*put doors when a floor tile has 2 floors on opposing sides and only 2 diagonal walls
-        (so we dont make doors everywhere in corridors) */
+    static void PlaceDoors(int[,] map)
+    /*put doors when a floor tile has 2 floors on opposing sides and only 2 diagonal walls
+    (so we dont make doors everywhere in corridors) */
     {
         int h = map.GetLength(0);
         int w = map.GetLength(1);
@@ -470,9 +470,9 @@ public static class DungeonGenerator
         }
     }
 
-    static void PlaceDecorations(int[,] map, int probaDecoration = 10, int probaLibrary = 15) 
-        /*if a floor tile has max one neighboor tile that isnt a floor it can becore deco
-        if a floor tile has only one neighboor that ist floor and it is a deco, then it can become library with that neighboor*/
+    static void PlaceDecorations(int[,] map, int probaDecoration = 10, int probaLibrary = 15)
+    /*if a floor tile has max one neighboor tile that isnt a floor it can becore deco
+    if a floor tile has only one neighboor that ist floor and it is a deco, then it can become library with that neighboor*/
     {
         int h = map.GetLength(0);
         int w = map.GetLength(1);
@@ -536,7 +536,7 @@ public static class DungeonGenerator
         }
     }
 
-    static void PlaceEntities(int[,] map, List<Node> nodes, int enemyCount = 10)
+    static void PlaceEntities(int[,] map, List<Node> nodes)
     {
         if (nodes == null || nodes.Count == 0) return;
 
@@ -547,23 +547,6 @@ public static class DungeonGenerator
         int px = playerRoom.xPos + playerRoom.xSize / 2;
         int py = playerRoom.yPos + playerRoom.ySize / 2;
         map[py, px] = 999; //player number
-
-        int enemiesPlaced = 0;
-        while (enemiesPlaced < enemyCount)
-        {
-            Node n = nodes[rand.Next(0, nodes.Count)];
-            if (n == startNode) continue; //no ennemies in player spawn room
-            Room r = n.room;
-
-            int ex = rand.Next(r.xPos + 1, r.xPos + r.xSize - 1);
-            int ey = rand.Next(r.yPos + 1, r.yPos + r.ySize - 1);
-
-            if (map[ey, ex] == 1)
-            {
-                map[ey, ex] = 88; //ennemy number
-                enemiesPlaced++;
-            }
-        }
 
         Node ladderNode = null;
         while (ladderNode == null)

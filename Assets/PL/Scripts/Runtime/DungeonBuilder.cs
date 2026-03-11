@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 public class DungeonBuilder : MonoBehaviour
 {
+    public static DungeonBuilder Instance;
+
     public int width = 80;
     public int height = 40;
     public int seed = 0;
@@ -18,6 +20,7 @@ public class DungeonBuilder : MonoBehaviour
     private Vector2Int playerSpawn = new Vector2Int(-1, -1);
     public GameObject Player;
     public GameObject EnemyPrefab;
+    public GameObject StalkerPrefab;
 
     public GameObject floorPrefab;
     public GameObject wallPrefab;
@@ -44,8 +47,17 @@ public class DungeonBuilder : MonoBehaviour
 
     private List<Vector3> enemySpawnPoints = new List<Vector3>();
     private List<Vector3> escapeSpawnPoints = new List<Vector3>();
+    private List<Vector3> stalkerTeleportPoints = new List<Vector3>();
+
+    private GameObject currentStalker;
+    private GameObject currentPatrolEnemy;
 
     private int[,] map;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -93,22 +105,9 @@ public class DungeonBuilder : MonoBehaviour
         if (rend != null)
             rend.enabled = false;
 
-        foreach (Vector3 pos in enemySpawnPoints)
-        {
-            GameObject e = Instantiate(EnemyPrefab, pos, Quaternion.identity);
-            EnemyAi ai = e.GetComponent<EnemyAi>();
-
-            if (ai != null)
-            {
-                Vector2Int tile = new Vector2Int((int)pos.x, (int)pos.z);
-                var roomTiles = GetRoomTiles(tile);
-                var patrol = PickPatrolPoints(roomTiles, 3);
-                ai.InitializePatrol(patrol);
-            }
-        }
-
-        foreach (Vector3 pos in escapeSpawnPoints)
-            Instantiate(EscapePrefab, pos, Quaternion.identity);
+        SpawnPatrolEnemy();
+        SpawnEscapeDoors();
+        SpawnStalker();
     }
 
     void Build(int[,] map)
@@ -122,6 +121,7 @@ public class DungeonBuilder : MonoBehaviour
         torchWalls.Clear();
         enemySpawnPoints.Clear();
         escapeSpawnPoints.Clear();
+        stalkerTeleportPoints.Clear();
         playerSpawn = new Vector2Int(-1, -1);
 
         int h = map.GetLength(0);
@@ -138,8 +138,12 @@ public class DungeonBuilder : MonoBehaviour
                 GameObject pf = null;
                 Quaternion rot = Quaternion.identity;
 
-                if (t == 1) pf = floorPrefab;
-
+                if (t == 1)
+                {
+                    pf = floorPrefab;
+                    stalkerTeleportPoints.Add(new Vector3(x + 0.5f, 0f,
+                        y + 0.5f));
+                }
                 else if (t == 2)
                 {
                     rot = Quaternion.Euler(0, 90, 0);
@@ -149,7 +153,6 @@ public class DungeonBuilder : MonoBehaviour
                     else
                         pf = isHospitalTheme ? wallHospital : wallPrefab;
                 }
-
                 else if (t == 3)
                 {
                     if (wallTorch != null && Random.Range(0, 100) < torchChance)
@@ -157,36 +160,42 @@ public class DungeonBuilder : MonoBehaviour
                     else
                         pf = isHospitalTheme ? wallHospital : wallPrefab;
                 }
-
                 else if (t == 4) pf = wallCorner;
-
                 else if (t == 5)
                 {
                     rot = Quaternion.Euler(0, 90, 0);
                     pf = doorPrefab;
                 }
-
                 else if (t == 6) pf = doorPrefab;
-
                 else if (t == 7)
                 {
                     if (decorationPrefabs != null && decorationPrefabs.Count > 0)
                         pf = decorationPrefabs[Random.Range(0,
                             decorationPrefabs.Count)];
+
+                    stalkerTeleportPoints.Add(new Vector3(x + 0.5f, 0f,
+                        y + 0.5f));
                 }
-
-                else if (t == 8) pf = libraryPrefab;
-
+                else if (t == 8)
+                {
+                    pf = libraryPrefab;
+                    stalkerTeleportPoints.Add(new Vector3(x + 0.5f, 0f,
+                        y + 0.5f));
+                }
                 else if (t == 999 || t == 88 || t == 777)
                 {
                     pf = floorPrefab;
+                    stalkerTeleportPoints.Add(new Vector3(x + 0.5f, 0f,
+                        y + 0.5f));
 
                     if (t == 999)
                         playerSpawn = new Vector2Int(x, y);
                     else if (t == 88)
-                        enemySpawnPoints.Add(new Vector3(x, 0f, y));
+                        enemySpawnPoints.Add(new Vector3(x + 0.5f, 0f,
+                            y + 0.5f));
                     else if (t == 777)
-                        escapeSpawnPoints.Add(new Vector3(x, 0f, y));
+                        escapeSpawnPoints.Add(new Vector3(x + 0.5f, 0f,
+                            y + 0.5f));
                 }
 
                 if (pf != null)
@@ -215,6 +224,62 @@ public class DungeonBuilder : MonoBehaviour
         }
     }
 
+    void SpawnPatrolEnemy()
+    {
+        if (EnemyPrefab == null)
+            return;
+
+        if (currentPatrolEnemy != null)
+            Destroy(currentPatrolEnemy);
+
+        if (escapeSpawnPoints == null || escapeSpawnPoints.Count == 0)
+            return;
+
+        Vector3 pos = escapeSpawnPoints[0];
+
+        currentPatrolEnemy = Instantiate(EnemyPrefab, pos,
+            Quaternion.identity);
+
+        EnemyAi ai = currentPatrolEnemy.GetComponent<EnemyAi>();
+
+        if (ai != null)
+        {
+            Vector2Int tile = new Vector2Int(Mathf.FloorToInt(pos.x),
+                Mathf.FloorToInt(pos.z));
+            var roomTiles = GetRoomTiles(tile);
+            var patrol = PickPatrolPoints(roomTiles, 3);
+            ai.InitializePatrol(patrol);
+        }
+    }
+
+    void SpawnEscapeDoors()
+    {
+        foreach (Vector3 pos in escapeSpawnPoints)
+            Instantiate(EscapePrefab, pos, Quaternion.identity);
+    }
+
+    void SpawnStalker()
+    {
+        if (StalkerPrefab == null)
+            return;
+
+        if (stalkerTeleportPoints == null || stalkerTeleportPoints.Count == 0)
+            return;
+
+        if (currentStalker != null)
+            Destroy(currentStalker);
+
+        Vector3 spawnPos = stalkerTeleportPoints[
+            Random.Range(0, stalkerTeleportPoints.Count)];
+
+        currentStalker = Instantiate(StalkerPrefab, spawnPos,
+            Quaternion.identity);
+
+        StalkerEnemy ai = currentStalker.GetComponent<StalkerEnemy>();
+        if (ai != null)
+            ai.SetTeleportPoints(stalkerTeleportPoints);
+    }
+
     void PlacePlayer(Vector2Int spawnTile)
     {
         if (Player == null)
@@ -239,6 +304,20 @@ public class DungeonBuilder : MonoBehaviour
             cc.enabled = true;
     }
 
+    public void TeleportPlayerToCurrentSpawn()
+    {
+        PlacePlayer(playerSpawn);
+
+        FogOfWarManager fog = FindFirstObjectByType<FogOfWarManager>();
+        if (fog != null)
+            fog.RefreshAllMasks();
+    }
+
+    public Vector3 GetCurrentSpawnWorldPosition()
+    {
+        return new Vector3(playerSpawn.x + 0.5f, 0f, playerSpawn.y + 0.5f);
+    }
+
     public void GenerateNewMap()
     {
         foreach (Transform child in transform)
@@ -248,15 +327,19 @@ public class DungeonBuilder : MonoBehaviour
         }
 
         GameObject[] oldEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-
         foreach (GameObject enemy in oldEnemies)
             Destroy(enemy);
 
         GameObject[] oldEscapeDoor =
             GameObject.FindGameObjectsWithTag("EscapeDoor");
-
         foreach (GameObject escapeDoor in oldEscapeDoor)
             Destroy(escapeDoor);
+
+        if (currentStalker != null)
+            Destroy(currentStalker);
+
+        if (currentPatrolEnemy != null)
+            Destroy(currentPatrolEnemy);
 
         StartCoroutine(RebuildNavMeshAfterCleanup());
     }
@@ -268,7 +351,6 @@ public class DungeonBuilder : MonoBehaviour
 
         NavMeshAgent[] agents = FindObjectsByType<NavMeshAgent>(
             FindObjectsSortMode.None);
-
         foreach (var a in agents)
             a.enabled = false;
 
@@ -287,10 +369,12 @@ public class DungeonBuilder : MonoBehaviour
             navMeshCube.transform.position =
                 new Vector3(width / 2f - 0.5f, 0f, height / 2f - 0.5f);
 
+            /*
             BoxCollider col = navMeshCube.GetComponent<BoxCollider>();
 
             if (col == null)
                 col = navMeshCube.AddComponent<BoxCollider>();
+            */
 
             if (navMeshSurface == null)
                 navMeshSurface = navMeshCube.GetComponent<NavMeshSurface>();
@@ -305,11 +389,11 @@ public class DungeonBuilder : MonoBehaviour
 
             navMeshSurface.BuildNavMesh();
 
-            foreach (Vector3 pos in escapeSpawnPoints)
-                Instantiate(EscapePrefab, pos, Quaternion.identity);
+            SpawnPatrolEnemy();
+            SpawnEscapeDoors();
+            SpawnStalker();
 
             MeshRenderer rend = navMeshCube.GetComponent<MeshRenderer>();
-
             if (rend != null)
                 rend.enabled = false;
         }
@@ -330,7 +414,6 @@ public class DungeonBuilder : MonoBehaviour
         PlacePlayer(playerSpawn);
 
         FogOfWarManager fog = FindFirstObjectByType<FogOfWarManager>();
-
         if (fog != null)
             fog.RefreshAllMasks();
     }
@@ -366,7 +449,8 @@ public class DungeonBuilder : MonoBehaviour
                     int tile = map[n.y, n.x];
 
                     if (!v.Contains(n) &&
-                       (tile == 1 || tile == 7 || tile == 8 || tile == 999))
+                       (tile == 1 || tile == 7 || tile == 8 || tile == 999 ||
+                        tile == 777))
                     {
                         v.Add(n);
                         q.Enqueue(n);
@@ -406,5 +490,10 @@ public class DungeonBuilder : MonoBehaviour
     public Vector3 GetMapOrigin()
     {
         return Vector3.zero;
+    }
+
+    public List<Vector3> GetTeleportPoints()
+    {
+        return stalkerTeleportPoints;
     }
 }

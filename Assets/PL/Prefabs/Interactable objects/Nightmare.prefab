@@ -124,4 +124,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9385bb9a0afd1d43bb6af373d3f2544, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SanityPickup
-  maxSanityIncrease: -5
+  maxSanityIncrease: -8
