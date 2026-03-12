@@ -12,7 +12,7 @@ public class SanityManager : MonoBehaviour
     public float sanity = 10f;          // current sanity
     public float maxSanity = 10f;       // max sanity cap (increases over time)
     public float drainRateInDarkness = 1f;
-    public float recoverRateInLight = 2f;
+    public float recoverRateInLight = 5f;
     public bool isInDarkness = true;
 
     [Header("Visual Effects")]
